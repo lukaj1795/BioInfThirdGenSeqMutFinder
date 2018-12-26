@@ -32,7 +32,7 @@ void main(int argc,char** argv){
 	g2.genomeString = "CGTCAGTGTGCCAACGTGCAACGCCT";
 	g1.genomeString = "AACGCCTGACCTGACTGGGTCA";
 	//g1.genomeString = V[0];
-	Kmer_extraction kmer = Kmer_extraction(3,4);
+	Kmer_extraction kmer = Kmer_extraction(4,5);
 	std::vector<Kmer> svi_kmerovi_sekvence;
 
 	cout << "string 1: " << g1.genomeString << "\n\n";
@@ -42,12 +42,12 @@ void main(int argc,char** argv){
 
 	cout <<"\n\n"<< "string 2: " << g2.genomeString << "\n\n";
 	svi_kmerovi_sekvence = kmer.extract(&g2);
-	for (Kmer i : svi_kmerovi_sekvence)
+	for (auto i : svi_kmerovi_sekvence)
 		std::cout << "kmer: " << i.string << " vrijednost: " << i.ordering_number_for_string << " pozicija: " << i.position << " sekvenca: " << i.identifier << "\n";
 
 	cout <<"\n\n"<< "string 3: " << g3.genomeString << "\n\n";
 	svi_kmerovi_sekvence = kmer.extract(&g3);
-	for (Kmer i : svi_kmerovi_sekvence)
+	for (auto i : svi_kmerovi_sekvence)
 		std::cout << "kmer: " << i.string << " vrijednost: " << i.ordering_number_for_string << " pozicija: " << i.position << " sekvenca: " << i.identifier << "\n";
 
 	int x;
