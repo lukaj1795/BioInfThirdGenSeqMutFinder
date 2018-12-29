@@ -1,8 +1,10 @@
 #include"FASTAUtility.h"
 #include<iostream>
 namespace FASTAUtility{
+	
 	std::vector<std::string> ReadFasta(std::ifstream &file){
 		std::string line, sequence;
+		//sequence.reserve(10000000);
 		auto i = 0;
 		std::vector<std::string> vector;
 		while (std::getline(file, line)){
@@ -17,12 +19,12 @@ namespace FASTAUtility{
 				if (i != 0){
 					vector.push_back(sequence);
 				}
-				sequence = "";
+				sequence = ""; 
 				i++;
 			}
 			//append to sequence
 			else{
-				sequence += line;
+				sequence.append(line);
 
 			}
 		}

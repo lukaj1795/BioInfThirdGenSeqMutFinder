@@ -1,3 +1,8 @@
+#ifndef KMER_H
+#define KMER_H
+#endif // !KMER_H
+
+
 #include <string>
 
 class Kmer { /*(i, p) identifying the sequence i and the position p within sequence at
