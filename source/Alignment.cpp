@@ -23,8 +23,8 @@ namespace Alignment{
 				int m = kmer_seq.string.length();
 				const int size = (n+1)*(m+1);
 				auto row=n+1;
-				int *matrix = new int[size];
-				int *operations = new int[size];
+				auto matrix =std::vector<int>(size);
+				auto operations = std::vector<int>(size);
 				int operation[3] = { 0 };
 				auto column = m + 1;
 			
@@ -81,8 +81,8 @@ namespace Alignment{
 		ref += kmer_ref.string[index / column];
 		seq += kmer_seq.string[index % column];
 
-		std::cout << kmer_ref.string<<"\n";
-		std::cout << kmer_seq.string << "\n"<<"Alignment\n";
+		//std::cout << kmer_ref.string<<"\n";
+		//std::cout << kmer_seq.string << "\n"<<"Alignment\n";
 
 		//backtracking
 		Backtrack(operations,matrix,column,index,kmer_ref.string,kmer_seq.string,ref,seq);
@@ -90,10 +90,10 @@ namespace Alignment{
 		std::reverse(ref.begin(),ref.end());
 		std::reverse(seq.begin(), seq.end());
 		///we don't want to have excess characters
-		int len = std::min(ref.length()-1,seq.length()-1);
+		//int len = std::min(ref.length()-1,seq.length()-1);
 		//std::cout << len << "\n";
-		std::cout << ref.substr(0,len) << '\n';
-		std::cout << seq.substr(0,len) << '\n'<<"\n";
+		//std::cout << ref.substr(0,len) << '\n';
+		//std::cout << seq.substr(0,len) << '\n'<<"\n";
 		}
 		}
 
@@ -102,7 +102,7 @@ namespace Alignment{
 	} 
 
 
-	void Backtrack(int *operations, int *matrix, int column, int index, std::string const &ref, std::string const &seq, std::string &ref_align, std::string &seq_align){
+	void Backtrack(std::vector<int>operations, std::vector<int>matrix, int column, int index, std::string const &ref, std::string const &seq, std::string &ref_align, std::string &seq_align){
 		while (matrix[index] != 0){
 			switch (operations[index])
 				{
