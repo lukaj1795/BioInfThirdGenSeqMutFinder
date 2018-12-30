@@ -8,6 +8,10 @@ bool sort_Kmers(Kmer k1, Kmer k2)
 {
 	return (k1.ordering_number_for_string < k2.ordering_number_for_string);
 }
+bool sort_pozicija(Kmer k1, Kmer k2)
+{
+	return (k1.position < k2.position);
+}
 std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 
 	int n = sequence->genomeString.length();
@@ -108,7 +112,7 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 			all_kmers.push_back(elem2);
 		}
 	}
-
+	std::sort(all_kmers.begin(), all_kmers.end(), sort_pozicija);
 	return all_kmers;
 };
 
