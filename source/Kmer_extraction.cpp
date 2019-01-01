@@ -3,6 +3,7 @@
 #include"Kmer.h"
 #include <algorithm>
 #include <vector>
+#include <string>
 
 bool sort_Kmers(Kmer k1, Kmer k2)
 {
@@ -29,7 +30,7 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 		bool found = false;
 		// Iterate over all elements in Vector and search if the k-mer is already contained within
 		for (auto & elem : all_kmers) {
-			if (elem.string == minimizer_lookup.front().string)
+			if (elem.string == minimizer_lookup.front().string && elem.position==minimizer_lookup.front().position)
 			{
 				found = true;
 				break;
@@ -88,7 +89,7 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 	for (auto & elem1 : end_kmers_left) {
 		bool found_left = false;
 		for (auto & elem : all_kmers) {
-			if (elem.string == elem1.string)
+			if (elem.string == elem1.string && elem.position==elem1.position)
 			{
 				found_left = true;
 				break;
@@ -102,7 +103,7 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 	for (auto & elem2 : end_kmers_right) {
 		bool found_right = false;
 		for (auto & elem : all_kmers) {
-			if (elem.string == elem2.string)
+			if (elem.string == elem2.string && elem.position==elem2.position)
 			{
 				found_right = true;
 				break;

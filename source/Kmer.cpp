@@ -33,3 +33,15 @@ Kmer::Kmer(std::string s, int p, int i) {
 		}
 	}
 }
+
+Kmer::Kmer() {
+	identifier = 0;
+	position = 0;
+	string = "";
+}
+bool Kmer::is_equal_to(Kmer kmer2) {
+	if (this->string == kmer2.string && this->position == kmer2.position && this->identifier == kmer2.identifier) {
+		return true;
+	}
+	return false;
+}

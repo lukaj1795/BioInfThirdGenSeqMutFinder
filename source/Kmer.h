@@ -17,6 +17,7 @@ public:
 	std::string ordering_number_for_string;/*We assign the values 0, 1, 2, 3 to C, A, T, G, respectively,
 	for the odd numbered bases of k-mers, and reverse the
 	ordering for even numbered bases*/
-
+	bool is_equal_to(Kmer kmer2);
 	Kmer(std::string string, int p, int i);
+	Kmer();
 };

@@ -7,7 +7,7 @@
 
 namespace Alignment{
 
-	std::string Align(std::vector<Kmer> reference, std::vector<Kmer> sequences);
+	std::vector<std::string> Align(Kmer reference, Kmer sequences);
 
 	void Backtrack(std::vector<int>operation, std::vector<int>matrix, int column, int index,std::string const &ref, std::string const &seq, std::string &ref_align, std::string &seq_align);
 
