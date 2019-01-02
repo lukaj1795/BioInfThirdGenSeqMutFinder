@@ -13,29 +13,35 @@ namespace mapping {
 		int n = 10;
 		int match = 0;
 		int flag1 = 0;
+		int counter = 0;
 		std::vector<int> seq_pos_match;
 		std::vector<int> ref_pos;
 		std::vector<int> seq_pos;
 		std::map <int,Kmer_mapping> matches;
 		std::vector<Kmer>::iterator speed_up;
 		
-		for (auto kmer_seq_iterator = sequence->begin(); kmer_seq_iterator != sequence->end(); ++kmer_seq_iterator) {
-			auto kmer_seq = *kmer_seq_iterator;
-			flag1++;
-			if (flag1 > 70 && match < 5) { //no overlap in the first 70 kmers..
-				return -99999;
-			}
-			if (flag1 < 300 && match>50) { //positive id on match--we can now find starting point
+		for (auto kmer_ref_iterator = reference->begin(); kmer_ref_iterator != reference->end(); ++kmer_ref_iterator) {
+			
+			auto kmer_ref = *kmer_ref_iterator;
+
+			if (match>8) { //positive id on match--we can now find starting point
 				break;
 			}
-			for (auto kmer_ref_iterator = reference->begin(); kmer_ref_iterator != reference->end(); ++kmer_ref_iterator) {
-				auto kmer_ref = *kmer_ref_iterator;
+			counter = 0;
+			flag1 = 0;
+			for (auto kmer_seq_iterator = sequence->begin(); kmer_seq_iterator != sequence->end(); ++kmer_seq_iterator) {
+				auto kmer_seq = *kmer_seq_iterator;
+				flag1++;
+				if (flag1 > 39) {
+					break;
+				}
 				
 				auto mapped = Alignment::Align(kmer_ref, kmer_seq);
 				if (!mapped.empty()) { //VERY IMPORTANT!!! ALL THE VALUES OF ALREADY ALIGNED KMERS GET BACK HERE INSIDE VECTOR MAPPED- CAN BE USED FOR MUTATION FINDING
 					//std::cout << "\nPOCETAKref:	" << kmer_ref.string << "\nPrviKmerSeq:	" << kmer_seq.string << "\n";
 					match++;
-
+					counter++;
+					
 					if(matches.find(kmer_seq.position) == matches.end())
 					{// key kmer_seq.position doesn't exist
 						Kmer_mapping new_position = Kmer_mapping(kmer_seq.position, kmer_ref.position);
@@ -44,6 +50,9 @@ namespace mapping {
 					}
 					else { //key already exists.. add new reference position to Kmer_mapping
 						matches.at(kmer_seq.position).add_position(kmer_ref.position);
+					}
+					if (counter > 2) {
+						break;
 					}
 				}
 			}
@@ -80,7 +89,7 @@ namespace mapping {
 																if (ee - dd >= *it5 - *it4 - n && ee - dd <= *it5 - *it4 + n) {
 																	for (auto ff : f) {
 																		if (ff - ee >= *it6 - *it5 - n && ff - ee <= *it6 - *it5 + n) {
-																			//std::cout << "\nNADENO PREKLAPANJE!!\n pozicija reference:	" << aa << "\n pozicija sekvence:	"<<*it1;
+																			std::cout << "\nNADENO PREKLAPANJE!!	"<< match;
 																			return(aa - *it1);
 																			
 																		}
@@ -100,6 +109,7 @@ namespace mapping {
 				}
 			}
 		}
+		std::cout << "\nNema PREKLAPANJa!!	" << match;
 		return -99999;
 	}
 }
