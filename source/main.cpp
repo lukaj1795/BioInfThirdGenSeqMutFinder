@@ -48,7 +48,7 @@ void main(int argc,char** argv){
 	//g2.genomeString = "CGATCGTAAGACCGCTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGA";
 	start = chrono::high_resolution_clock::now();
 	g1.genomeString = references[0];
-	g2.genomeString = V[0];
+	//g2.genomeString = V[0];
 	
 	Kmer_extraction kmer = Kmer_extraction(20,20);
 	auto kmer1=kmer.extract(&g1);
@@ -59,22 +59,22 @@ void main(int argc,char** argv){
 	std::map<int,int> pokrivenost1;
 	int counter = 1;
 	for (auto i : V) {
-		cout << "\n\nstring:	" << counter << "	duljina:	" << i.length();
+		cout << "\n\nstring:	" << counter << "	duljina:	" << i.size();
 		g2.genomeString = i;
 		auto kmer2 = kmer.extract(&g2);
 		int position = mapping::map_to_reference(&kmer1, &kmer2);
 		if (position != -99999) {
 			cout << "\npozicija unutar reference gdje bi se trebali poceti preklapati:	" << position << "	+-10 mjesta" << "\n";
-			pokrivenost1.insert(std::pair<int,int>(counter,position));
+			pokrivenost1.insert(std::pair<int,int>(position,counter));
 		}
 		counter++;
 	}
 	finish = chrono::high_resolution_clock::now();
 	cout <<"Alignment:	"<< std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
 	
-	int counter = 1;
+
 	for (auto i : pokrivenost1) {
-		cout << "\nstring:	" <<i.first<<"	position:	"<< i.second;
+		cout << "\nPosition:	" <<i.first<<"	string:	"<< i.second;
 	}
 	/*
 	cout << "\n\n" << "string 1: " << g1.genomeString << "\n\n";

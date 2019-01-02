@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <map>
+#include <iostream>
 
 bool sort_Kmers(Kmer k1, Kmer k2)
 {
@@ -15,8 +17,9 @@ bool sort_pozicija(Kmer k1, Kmer k2)
 }
 std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 
-	int n = sequence->genomeString.length();
-	std::vector<Kmer> all_kmers;
+	int n = sequence->genomeString.size();
+	std::map<int,Kmer> all_kmers;
+	std::vector<Kmer> all_return;
 
 	/*the length of String*/
 	for (int j = 0; j <= n - window_size; ++j) {
@@ -29,16 +32,8 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 		std::sort(minimizer_lookup.begin(), minimizer_lookup.end(), sort_Kmers);
 		bool found = false;
 		// Iterate over all elements in Vector and search if the k-mer is already contained within
-		for (auto & elem : all_kmers) {
-			if (elem.string == minimizer_lookup.front().string && elem.position==minimizer_lookup.front().position)
-			{
-				found = true;
-				break;
-			}
-		}
-		if (!found) { /*if the k-mer is unique, add it*/
-			all_kmers.push_back(minimizer_lookup.front());
-		}
+
+		all_kmers.insert(std::pair<int, Kmer>(minimizer_lookup.front().position, minimizer_lookup.front()));
 	}
 	/*combining (w,k)-minimizers of a string with (u,k)-end-minimizers for u=1,..,w-1 at both ends of the string,
 	all bases of the string will be covered with some minimizer*/
@@ -86,35 +81,18 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 	/*add only unique minimizers from end-minimizers to all_minimizers*/
 	
 	// Iterate over all minimizers at the left end, add the minimizer to all_kmers only if it is unique
-	for (auto & elem1 : end_kmers_left) {
-		bool found_left = false;
-		for (auto & elem : all_kmers) {
-			if (elem.string == elem1.string && elem.position==elem1.position)
-			{
-				found_left = true;
-				break;
-			}
-		}
-		if (!found_left) {
-			all_kmers.push_back(elem1);
-		}
-	}
+	
 	// Iterate over all minimizers at the right end, add the minimizer to all_kmers only if it is unique
-	for (auto & elem2 : end_kmers_right) {
-		bool found_right = false;
-		for (auto & elem : all_kmers) {
-			if (elem.string == elem2.string && elem.position==elem2.position)
-			{
-				found_right = true;
-				break;
-			}
-		}
-		if (!found_right) {
-			all_kmers.push_back(elem2);
-		}
+	for (auto & elem : end_kmers_left) {
+		all_kmers.insert(std::pair<int, Kmer>(elem.position, elem));
 	}
-	std::sort(all_kmers.begin(), all_kmers.end(), sort_pozicija);
-	return all_kmers;
+	for (auto & elem : end_kmers_right) {
+		all_kmers.insert(std::pair<int, Kmer>(elem.position, elem));
+	}
+	for (auto i : all_kmers) {
+		all_return.push_back(i.second);
+	}
+	return all_return;
 };
 
 
