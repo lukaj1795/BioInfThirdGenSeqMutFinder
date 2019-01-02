@@ -8,6 +8,9 @@
 #include "Kmer_mapping.h"
 
 namespace mapping {
+
+	int error = -99999;
+
 	int map_to_reference(std::vector<Kmer>* reference, std::vector<Kmer>* sequence)
 	{
 		int n = 10;
@@ -89,7 +92,7 @@ namespace mapping {
 																if (ee - dd >= *it5 - *it4 - n && ee - dd <= *it5 - *it4 + n) {
 																	for (auto ff : f) {
 																		if (ff - ee >= *it6 - *it5 - n && ff - ee <= *it6 - *it5 + n) {
-																			std::cout << "\nNADENO PREKLAPANJE!!	"<< match;
+																			///std::cout << "\nNADENO PREKLAPANJE!!	"<< match;
 																			return(aa - *it1);
 																			
 																		}
@@ -109,7 +112,42 @@ namespace mapping {
 				}
 			}
 		}
-		std::cout << "\nNema PREKLAPANJa!!	" << match;
+		///std::cout << "\nNema PREKLAPANJa!!	" << match;
 		return -99999;
 	}
+	
+
+	int alternative_mapping(std::vector<Kmer>* reference, std::vector<Kmer>* sequence){
+
+		int match = 0;
+
+		int counter = 0;
+		int threshold = 12;
+
+
+
+		for (auto kmer = reference->begin(); kmer != reference->end(); ++kmer){
+			auto ref = *kmer;
+			counter = 0;
+			for (auto seq = sequence->begin(); seq != sequence->end(); ++seq){
+				auto seq_K = *seq;
+				auto sr = ref.ordering_number_for_string;
+				auto ss = seq_K.ordering_number_for_string;
+				if (sr == ss){
+					///std::cout << ref.string << " " << seq_K.string << "\n";
+					return ref.position - seq_K.position;
+					}
+				if (counter > threshold)
+					{
+					break;
+					}
+				counter++;
+				}
+
+			}
+		return error;
+		}
+
+
+
 }

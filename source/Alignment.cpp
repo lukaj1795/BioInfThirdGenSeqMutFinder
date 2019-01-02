@@ -81,12 +81,12 @@ namespace Alignment{
 					std::reverse(ref.begin(), ref.end());
 					std::reverse(seq.begin(), seq.end());
 
-					aligned_string.push_back(ref);
-					aligned_string.push_back(seq);
+					
 					///we don't want to have excess characters
 					int len = std::min(ref.length() - 1, seq.length() - 1);
 					//std::cout << len << "\n";
-					
+					aligned_string.push_back(ref.substr(0,len));
+					aligned_string.push_back(seq.substr(0,len));
 					//std::cout <<"ref:	"<< kmer_ref.string << "\n";
 					//std::cout <<"seq:	"<< kmer_seq.string << "\n" << "\nAlignment\n";
 					//std::cout <<"ref:	"<< ref/*.substr(0, len) */ << '\n';
