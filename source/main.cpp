@@ -57,8 +57,9 @@ void main(int argc,char** argv){
 
 	start = chrono::high_resolution_clock::now();
 	std::map<int,int> pokrivenost1;
-	int counter = 1;
+	int counter = 0;
 	for (auto i : V) {
+		counter++;
 		cout << "\n\nstring:	" << counter << "	duljina:	" << i.size();
 		g2.genomeString = i;
 		auto kmer2 = kmer.extract(&g2);
@@ -67,7 +68,7 @@ void main(int argc,char** argv){
 			cout << "\npozicija unutar reference gdje bi se trebali poceti preklapati:	" << position << "	+-10 mjesta" << "\n";
 			pokrivenost1.insert(std::pair<int,int>(position,counter));
 		}
-		counter++;
+		
 	}
 	finish = chrono::high_resolution_clock::now();
 	cout <<"Alignment:	"<< std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";

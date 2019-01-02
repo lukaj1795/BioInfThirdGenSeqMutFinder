@@ -24,7 +24,7 @@ namespace mapping {
 			
 			auto kmer_ref = *kmer_ref_iterator;
 
-			if (match>8) { //positive id on match--we can now find starting point
+			if (match>12) { //positive id on match--we can now find starting point
 				break;
 			}
 			counter = 0;
@@ -32,7 +32,7 @@ namespace mapping {
 			for (auto kmer_seq_iterator = sequence->begin(); kmer_seq_iterator != sequence->end(); ++kmer_seq_iterator) {
 				auto kmer_seq = *kmer_seq_iterator;
 				flag1++;
-				if (flag1 > 39) {
+				if (flag1 > 44) {
 					break;
 				}
 				
