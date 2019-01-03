@@ -6,7 +6,8 @@ namespace MutationFinder{
 	enum Mutation {
 		INSERT,
 		DELETE,
-		SUBSTITUTION
+		SUBSTITUTION,
+		NONE
 		};
 
 	class MutationOutput

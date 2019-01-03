@@ -11,7 +11,7 @@ namespace MutationFinder{
 		if (file.is_open()){
 			for (auto line : output){
 
-				char mut;
+				char mut=' ';
 
 				switch (line.mutation)
 					{
@@ -63,6 +63,10 @@ namespace MutationFinder{
 					auto pos = position + i - insertions;
 					output[pos].push_back(MutationOutput(SUBSTITUTION, seq[i], pos));
 				}
+				else if (ref[i] == seq[i]){
+					auto pos = position + i - insertions;
+					output[pos].push_back(MutationOutput(NONE, seq[i], pos));
+					}
 		}
 	}
 
@@ -86,8 +90,9 @@ namespace MutationFinder{
 					most = mut.first;
 				}
 			}
-
-			output.push_back(most);
+			if (most.mutation != NONE){
+				output.push_back(most);
+				}
 
 		}
 

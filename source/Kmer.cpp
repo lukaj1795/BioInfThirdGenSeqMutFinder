@@ -2,6 +2,18 @@
 #include <map>
 #include"Kmer.h"
 
+std::map<char, int> order_map_odd = {
+		{ 'C', 0 },
+		{ 'A', 1 },
+		{ 'T', 2 },
+		{ 'G', 3 }
+	};
+std::map<char, int> order_map_even = {
+		{ 'C', 3 },
+		{ 'A', 2 },
+		{ 'T', 1 },
+		{ 'G', 0 }
+	};
 
 Kmer::Kmer(std::string s, int p, int i) {
 	identifier = i;
@@ -16,10 +28,10 @@ Kmer::Kmer(std::string s, int p, int i) {
 	int j = string.size()-1;
 	for (std::string::size_type i = 0; i < string.size(); ++i) {
 		if (i % 2 == 0) { //base is even numbered inside k-mer
-			ordering_number_for_string += order_map_even.at(string[i])/ (std::pow(10,i));
+			ordering_number_for_string =10*ordering_number_for_string+order_map_even.at(string[i]);
 		}
 		else { //base is odd numbered inside k-mer
-			ordering_number_for_string += order_map_odd.at(string[i])/ (std::pow(10,i));
+			ordering_number_for_string =10*ordering_number_for_string+order_map_odd.at(string[i]);
 		}
 	}
 
