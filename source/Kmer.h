@@ -2,7 +2,7 @@
 #define KMER_H
 #endif // !KMER_H
 
-
+#include <map>
 #include <string>
 
 class Kmer { /*(i, p) identifying the sequence i and the position p within sequence at
@@ -13,6 +13,18 @@ public:
 	
 	int position; /*position inside the string*/
 	int identifier; /*sequence i*/
+	std::map<char, int> order_map_odd = {
+	{ 'C', 0 },
+	{ 'A', 1 },
+	{ 'T', 2 },
+	{ 'G', 3 }
+	};
+	std::map<char, int> order_map_even = {
+	{ 'C', 3 },
+	{ 'A', 2 },
+	{ 'T', 1 },
+	{ 'G', 0 }
+	};
 	
 	double ordering_number_for_string;/*We assign the values 0, 1, 2, 3 to C, A, T, G, respectively,
 	for the odd numbered bases of k-mers, and reverse the
@@ -20,4 +32,8 @@ public:
 	bool is_equal_to(Kmer kmer2);
 	Kmer(std::string string, int p, int i);
 	Kmer();
+	bool operator<(const Kmer& rhs) const
+	{
+		return ordering_number_for_string < rhs.ordering_number_for_string;
+	}
 };

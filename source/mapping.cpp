@@ -9,11 +9,24 @@
 
 namespace mapping {
 	int error = -99999;
+	std::map<char, int> k1_count = {
+		{ 'C', 0 },
+		{ 'A', 0 },
+		{ 'T', 0 },
+		{ 'G', 0 }
+	};
+	std::map<char, int> k2_count = {
+	{ 'C', 0 },
+	{ 'A', 0 },
+	{ 'T', 0 },
+	{ 'G', 0 }
+	};
+
 	int map_to_reference(std::vector<Kmer>* reference, std::vector<Kmer>* sequence)
 	{
 
 		int kmer_size = reference->front().string.size();
-		int n = 10;
+		int n = 20;
 		int match = 0;
 		int flag1 = 0;
 		int counter = 0;
@@ -23,19 +36,29 @@ namespace mapping {
 		std::map <int,Kmer_mapping> matches;
 		std::vector<Kmer>::iterator speed_up;
 		counter = 0;
+		int step = 5;
 
 		for (auto kmer_ref_iterator = reference->begin(); kmer_ref_iterator != reference->end(); ++kmer_ref_iterator) {
 			
 			auto kmer_ref = *kmer_ref_iterator;
-			
+			counter++;
+			if (match == 0) {
+				if (counter < step) {
+					continue;
+				}
+				counter = 0; //reset counter for skipping STEP number of references
+			}
+			if (match > 12) {
+				break;
+			}
 			flag1 = 0;
 			for (auto kmer_seq_iterator = sequence->begin(); kmer_seq_iterator != sequence->end(); ++kmer_seq_iterator) {
 				auto kmer_seq = *kmer_seq_iterator;
 				flag1++;
-				if (flag1 < 10) {
+				if (flag1 < 5) {
 					continue;
 				}
-				if (flag1 > 79) {
+				if (flag1 > 99) {
 					break;
 				}
 				if (!mapping::check_match(kmer_ref, kmer_seq)) {
@@ -149,18 +172,11 @@ namespace mapping {
 
 	bool mapping::check_match(Kmer k1, Kmer k2) {
 		int mutation_number = 2;
-		std::map<char, int> k1_count = {
-		{ 'C', 0 },
-		{ 'A', 0 },
-		{ 'T', 0 },
-		{ 'G', 0 }
-		};
-		std::map<char, int> k2_count = {
-		{ 'C', 0 },
-		{ 'A', 0 },
-		{ 'T', 0 },
-		{ 'G', 0 }
-		};
+		for (auto it = k1_count.begin(); it != k1_count.end(); it++) {
+			auto a = *it;
+			k1_count.at(a.first) = 0;
+			k2_count.at(a.first) = 0;
+		}
 		int j = 0;
 		for (std::string::size_type i = 0; i < k1.string.size(); ++i) {
 			j=k1_count.at(k1.string[i]);
