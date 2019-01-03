@@ -8,9 +8,6 @@
 #include "Kmer_mapping.h"
 
 namespace mapping {
-
-	int error = -99999;
-
 	int map_to_reference(std::vector<Kmer>* reference, std::vector<Kmer>* sequence)
 	{
 		int n = 10;
@@ -38,7 +35,9 @@ namespace mapping {
 				if (flag1 > 44) {
 					break;
 				}
-				
+				if (!mapping::check_match(kmer_ref, kmer_seq)) {
+					continue;
+				}
 				auto mapped = Alignment::Align(kmer_ref, kmer_seq);
 				if (!mapped.empty()) { //VERY IMPORTANT!!! ALL THE VALUES OF ALREADY ALIGNED KMERS GET BACK HERE INSIDE VECTOR MAPPED- CAN BE USED FOR MUTATION FINDING
 					//std::cout << "\nPOCETAKref:	" << kmer_ref.string << "\nPrviKmerSeq:	" << kmer_seq.string << "\n";
@@ -78,7 +77,7 @@ namespace mapping {
 								auto c = matches.at(*it3).reference_positions;
 								auto d = matches.at(*it4).reference_positions;
 								auto e = matches.at(*it5).reference_positions;
-								auto f = matches.at(*it6).reference_positions;
+								//auto f = matches.at(*it6).reference_positions;
 
 								for (auto aa : a) {
 									
@@ -90,13 +89,13 @@ namespace mapping {
 														if (dd - cc >= *it4 - *it3 - n && dd - cc <= *it4 - *it3 + n) {
 															for (auto ee : e) {
 																if (ee - dd >= *it5 - *it4 - n && ee - dd <= *it5 - *it4 + n) {
-																	for (auto ff : f) {
-																		if (ff - ee >= *it6 - *it5 - n && ff - ee <= *it6 - *it5 + n) {
-																			///std::cout << "\nNADENO PREKLAPANJE!!	"<< match;
+																	//for (auto ff : f) {
+																		//if (ff - ee >= *it6 - *it5 - n && ff - ee <= *it6 - *it5 + n) {
+																			std::cout << "\nNADENO PREKLAPANJE!!	"<< match;
 																			return(aa - *it1);
 																			
-																		}
-																	}
+																		//}
+																	//}
 																}
 															}
 														}
@@ -112,12 +111,10 @@ namespace mapping {
 				}
 			}
 		}
-		///std::cout << "\nNema PREKLAPANJa!!	" << match;
+		std::cout << "\nNema PREKLAPANJa!!	" << match;
 		return -99999;
 	}
-	
-
-	int alternative_mapping(std::vector<Kmer>* reference, std::vector<Kmer>* sequence){
+	int alternative_mapping(std::vector<Kmer>* reference, std::vector<Kmer>* sequence) {
 
 		int match = 0;
 
@@ -126,28 +123,51 @@ namespace mapping {
 
 
 
-		for (auto kmer = reference->begin(); kmer != reference->end(); ++kmer){
+		for (auto kmer = reference->begin(); kmer != reference->end(); ++kmer) {
 			auto ref = *kmer;
 			counter = 0;
-			for (auto seq = sequence->begin(); seq != sequence->end(); ++seq){
+			for (auto seq = sequence->begin(); seq != sequence->end(); ++seq) {
 				auto seq_K = *seq;
 				auto sr = ref.ordering_number_for_string;
 				auto ss = seq_K.ordering_number_for_string;
-				if (sr == ss){
+				if (sr == ss) {
 					///std::cout << ref.string << " " << seq_K.string << "\n";
 					return ref.position - seq_K.position;
-					}
-				if (counter > threshold)
-					{
-					break;
-					}
-				counter++;
 				}
-
+				if (counter > threshold)
+				{
+					break;
+				}
+				counter++;
 			}
-		return error;
+
 		}
-
-
-
+		return error;
+	}
+	bool mapping::check_match(Kmer k1, Kmer k2) {
+		std::map<char, int> k1_count = {
+		{ 'C', 0 },
+		{ 'A', 0 },
+		{ 'T', 0 },
+		{ 'G', 0 }
+		};
+		std::map<char, int> k2_count = {
+		{ 'C', 0 },
+		{ 'A', 0 },
+		{ 'T', 0 },
+		{ 'G', 0 }
+		};
+		int j = 0;
+		for (std::string::size_type i = 0; i < k1.string.size(); ++i) {
+			j=k1_count.at(k1.string[i]);
+			k1_count.at(k1.string[i]) = ++j;
+			j=k2_count.at(k2.string[i]);
+			k2_count.at(k2.string[i]) = ++j;
+		}
+		//finished counting;
+		if (abs(k1_count.at('A') - k2_count.at('A')) + abs(k1_count.at('T') - k2_count.at('T')) + abs(k1_count.at('C') - k2_count.at('C')) + abs(k1_count.at('G') - k2_count.at('G')) > 3) {
+			return false;
+		}
+		return true;
+	}
 }
