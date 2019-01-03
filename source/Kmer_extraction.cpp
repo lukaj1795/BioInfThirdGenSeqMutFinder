@@ -101,3 +101,19 @@ Kmer_extraction::Kmer_extraction(int x, int y) {
 	k = y;
 	window_size = w + k - 1;
 }
+
+std::vector<Kmer> Kmer_extraction::extract_complement(Genome *sequence) {
+	std::string complement= "";
+	std::map<char, char> komplement = {
+		{ 'C', 'G' },
+		{ 'A', 'T' },
+		{ 'T', 'A' },
+		{ 'G', 'C' }
+	};
+	for (auto i : sequence->genomeString) {
+		complement += komplement.at(i);
+	}
+	Genome g = Genome(sequence->identifier);
+	g.genomeString = complement;
+	return Kmer_extraction::extract(&g);
+}

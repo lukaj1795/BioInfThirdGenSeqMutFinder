@@ -49,7 +49,7 @@ void mutation_test(){
 
 void main(int argc, char** argv){
 
-	mutation_test();
+	//mutation_test();
 
 	int k = 20;
 	auto start = chrono::high_resolution_clock::now();
@@ -75,43 +75,48 @@ void main(int argc, char** argv){
 		}
 	auto finish = chrono::high_resolution_clock::now();
 	cout << "Reading input files:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n\n";
-	//cout << reference << "\n";
-	//cout << V[0] << "\n";
 
-
-	Genome g1 = Genome(1);
-	Genome g2 = Genome(2);
+	Genome g1 = Genome(0); //reference has identifier 0
 	//g1.genomeString = "GTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGATGCATCAGCGAGCAGCGATCGTAAGACCGCTAGCTAAGCTCGGCCTACGATAACGACATCAGCTACGATGCATCGATCTGATCGAGCATGCTGAGCAGCGTACTATGCGTAGTCATGCTGAGTGTCTTGGTCAGCAAAATGCATCGATCGACATGGTGTTCGATCGTAAGACCGCTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGAGGTCGTCACGTTACTCACAAGCAT";
 	//g2.genomeString = "CGATCGTAAGACCGCTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGA";
 	start = chrono::high_resolution_clock::now();
 	g1.genomeString = references[0];
-	//g2.genomeString = V[0];
 
 	Kmer_extraction kmer = Kmer_extraction(20, k);
-	auto kmer1 = kmer.extract(&g1);
+	auto kmer0 = kmer.extract(&g1);
 	finish = chrono::high_resolution_clock::now();
 	cout << "k_mer extraction reference:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
 
 	start = chrono::high_resolution_clock::now();
 	std::map<int, int> pokrivenost1;
+	std::map<int, std::vector<Kmer>> sequence_kmers; //keeping all the kmers, int is identifier
 	int counter = 0;
 	for (auto i : V) {
 		counter++;
-		///cout << "\n\nstring:	" << counter << "	duljina:	" << i.size();
-		g2.genomeString = i;
-		auto kmer2 = kmer.extract(&g2);
-		int position = mapping::map_to_reference(&kmer1, &kmer2);
-		if (position != -99999) {
-			//cout << "\npozicija unutar reference gdje bi se trebali poceti preklapati:	" << position << "	+-10 mjesta" << "\n";
-			pokrivenost1.insert(std::pair<int, int>(position, counter));
+		cout << "\nstring:	" << counter;
+		Genome g = Genome(counter);
+		g.genomeString = i;
+		auto kmerx = kmer.extract(&g);
+		sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(counter, kmerx));
+		int positionx = mapping::map_to_reference(&kmer0, &kmerx);
+		if (positionx != -99999) {
+			cout << "\npozicija unutar reference gdje bi se trebali poceti preklapati:	" << positionx << "	+-10 mjesta" << "\n";
+			pokrivenost1.insert(std::pair<int, int>(positionx, counter));
 			///get aligned strings
 			///map mutations
 
-			}
+		}
+		cout << "\ncomplement:	";
+		auto kmery = kmer.extract_complement(&g);
+		int positiony = mapping::map_to_reference(&kmer0, &kmery);
+		if (positiony != -99999) {
+			cout << "\npozicija unutar reference gdje bi se trebali poceti preklapati:	" << positiony << "	+-10 mjesta" << "\n";
+			pokrivenost1.insert(std::pair<int, int>(positiony, counter));
+			///get aligned strings
+			///map mutations
 
-
-
-
+		}
+	}
 		auto m = MutationFinder::MapToVector(map);
 		MutationFinder::output_to_file("lambda_mut.csv", m);
 
@@ -125,26 +130,10 @@ void main(int argc, char** argv){
 
 			}
 
-
-
-		/*
-		cout << "\n\n" << "string 1: " << g1.genomeString << "\n\n";
-		for (auto i : kmer1)
-		std::cout <<"kmer: "<< i.string << " vrijednost: " << i.ordering_number_for_string<<" pozicija: " << i.position << " sekvenca: " << i.identifier <<"\n";
-
-		cout <<"\n\n"<< "string 2: " << g2.genomeString << "\n\n";
-		for (auto i : kmer2)
-		std::cout << "kmer: " << i.string << " vrijednost: " << i.ordering_number_for_string << " pozicija: " << i.position << " sekvenca: " << i.identifier << "\n";
-		*/
-
-
-		//int x;
-		//cin >> x;
-
-
+		int x;
+		cin >> x;
 
 		///mutation_test();
 
-		}
+}
 
-	}

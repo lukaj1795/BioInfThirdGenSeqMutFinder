@@ -8,6 +8,7 @@
 #include "Kmer_mapping.h"
 
 namespace mapping {
+	int error = -99999;
 	int map_to_reference(std::vector<Kmer>* reference, std::vector<Kmer>* sequence)
 	{
 		int n = 10;
@@ -32,7 +33,7 @@ namespace mapping {
 			for (auto kmer_seq_iterator = sequence->begin(); kmer_seq_iterator != sequence->end(); ++kmer_seq_iterator) {
 				auto kmer_seq = *kmer_seq_iterator;
 				flag1++;
-				if (flag1 > 44) {
+				if (flag1 > 39) {
 					break;
 				}
 				if (!mapping::check_match(kmer_ref, kmer_seq)) {
@@ -111,7 +112,7 @@ namespace mapping {
 				}
 			}
 		}
-		std::cout << "\nNema PREKLAPANJa!!	" << match;
+		//std::cout << "\nNema PREKLAPANJa!!	" << match;
 		return -99999;
 	}
 	int alternative_mapping(std::vector<Kmer>* reference, std::vector<Kmer>* sequence) {

@@ -17,4 +17,6 @@ public:
 
 	Kmer_extraction(int x, int y);
 
+	std::vector<Kmer> extract_complement(Genome * sequence);
+
 };
