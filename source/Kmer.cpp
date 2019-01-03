@@ -7,6 +7,7 @@ Kmer::Kmer(std::string s, int p, int i) {
 	identifier = i;
 	string = s;
 	position = p;
+	ordering_number_for_string = 0;
 
 	std::map<char, int> order_map_odd = {
 	{ 'C', 0 },
@@ -25,13 +26,13 @@ Kmer::Kmer(std::string s, int p, int i) {
 	for the odd numbered bases of k-mers, and reverse the
 	ordering for even numbered bases*/
 	/*if the base is even numbered*/
+	int j = string.size()-1;
 	for (std::string::size_type i = 0; i < string.size(); ++i) {
-		int j = i+1;
 		if (i % 2 == 0) { //base is even numbered inside k-mer
-			ordering_number_for_string += (10^j)*order_map_even.at(string[i]);
+			ordering_number_for_string += order_map_even.at(string[i])/ (std::pow(10,i));
 		}
 		else { //base is odd numbered inside k-mer
-			ordering_number_for_string += (10^j)*order_map_odd.at(string[i]);
+			ordering_number_for_string += order_map_odd.at(string[i])/ (std::pow(10,i));
 		}
 	}
 

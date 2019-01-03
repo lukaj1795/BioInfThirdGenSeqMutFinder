@@ -14,7 +14,7 @@ public:
 	int position; /*position inside the string*/
 	int identifier; /*sequence i*/
 	
-	int ordering_number_for_string;/*We assign the values 0, 1, 2, 3 to C, A, T, G, respectively,
+	double ordering_number_for_string;/*We assign the values 0, 1, 2, 3 to C, A, T, G, respectively,
 	for the odd numbered bases of k-mers, and reverse the
 	ordering for even numbered bases*/
 	bool is_equal_to(Kmer kmer2);

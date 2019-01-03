@@ -19,13 +19,13 @@ void mutation_test(){
 	auto g1 = Genome(1);
 	auto g2 = Genome(2);
 
-	g1.genomeString = "AACCTTGGAACCG";
+	g1.genomeString = "AACCTTGGAACCG"; //needs to be enlarged so strings have atleast 5 exact kmers for map_to_reference positive match
 	g2.genomeString = "AACCTTGGACTCG";
 
 	auto kextraxt = Kmer_extraction(5, 5);
 	auto kmer1 = kextraxt.extract(&g1);
 	auto kmer2 = kextraxt.extract(&g2);
-	int pos = mapping::alternative_mapping(&kmer1, &kmer2);
+	int pos = mapping::map_to_reference(&kmer1, &kmer2); //alternative mapping is obsolete, map to reference requires atleast 5 exact kmers within sequences to find position
 	std::cout << pos << "\n";
 	std::map<int, std::vector<MutationFinder::MutationOutput>> map;
 	for (int i = 0; i < kmer2.size(); i++){
@@ -106,7 +106,8 @@ void main(int argc, char** argv){
 			///map mutations
 
 		}
-		cout << "\ncomplement:	";
+		// COMPLEMENT use is obsolete
+		/*cout << "\ncomplement:	";
 		auto kmery = kmer.extract_complement(&g);
 		int positiony = mapping::map_to_reference(&kmer0, &kmery);
 		if (positiony != -99999) {
@@ -114,8 +115,8 @@ void main(int argc, char** argv){
 			pokrivenost1.insert(std::pair<int, int>(positiony, counter));
 			///get aligned strings
 			///map mutations
-
 		}
+		*/
 	}
 		auto m = MutationFinder::MapToVector(map);
 		MutationFinder::output_to_file("lambda_mut.csv", m);
@@ -130,8 +131,8 @@ void main(int argc, char** argv){
 
 			}
 
-		int x;
-		cin >> x;
+		//int x;
+		//cin >> x;
 
 		///mutation_test();
 
