@@ -6,17 +6,18 @@
 #include <map>
 #include <set>
 #include "Kmer_mapping.h"
+#include <unordered_map>
 
 namespace mapping {
 	int error = -99999;
 	
-	std::map<char, int> k1_count = {
+	std::unordered_map<char, int> k1_count = {
 		{ 'C', 0 },
 		{ 'A', 0 },
 		{ 'T', 0 },
 		{ 'G', 0 }
 	};
-	std::map<char, int> k2_count = {
+	std::unordered_map<char, int> k2_count = {
 		{ 'C', 0 },
 		{ 'A', 0 },
 		{ 'T', 0 },
