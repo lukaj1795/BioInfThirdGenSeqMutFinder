@@ -9,6 +9,7 @@
 
 namespace mapping {
 	int error = -99999;
+	/*
 	std::map<char, int> k1_count = {
 		{ 'C', 0 },
 		{ 'A', 0 },
@@ -20,7 +21,7 @@ namespace mapping {
 		{ 'A', 0 },
 		{ 'T', 0 },
 		{ 'G', 0 }
-	};
+	};*/
 	std::vector<char> bases = { 'A', 'C', 'T', 'G' };
 	int map_to_reference(std::vector<Kmer>* reference, std::vector<Kmer>* sequence)
 	{
@@ -61,9 +62,9 @@ namespace mapping {
 				if (flag1 > 99) {
 					break;
 				}
-				if (!mapping::check_match(kmer_ref, kmer_seq)) {
-					continue;
-				}
+				//if (!mapping::check_match(kmer_ref, kmer_seq)) {
+					//continue;
+				//}
 				//auto mapped = Alignment::Align_int(kmer_ref, kmer_seq); //HERE IS BIGGEST TIME CONSUMER NEEDS TO BE CHANGED
 				auto mapped = (kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string);
 				//if (mapped > (kmer_size * 4 - 4 - 2 * 2)) { //VERY IMPORTANT!!! ALL THE VALUES OF ALREADY ALIGNED KMERS GET BACK HERE INSIDE VECTOR MAPPED- CAN BE USED FOR MUTATION FINDING
@@ -169,7 +170,7 @@ namespace mapping {
 		}
 		return error;
 	}*/
-
+	/*
 	bool mapping::check_match(const Kmer &k1, const Kmer &k2) {
 		int mutation_number = 2;
 		for (auto a:bases) {
@@ -190,4 +191,5 @@ namespace mapping {
 		}
 		return true;
 	}
+	*/
 }
