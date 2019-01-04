@@ -11,6 +11,7 @@
 #include <chrono>
 #include <map>
 #include "MutationFinder.h"
+
 using namespace std;
 using namespace FASTAUtility;
 
@@ -98,27 +99,53 @@ void main(int argc, char** argv){
 		//cout << "\nstring:	" << counter;
 		Genome g = Genome(counter);
 		g.genomeString = i;
+		//auto start1 = chrono::high_resolution_clock::now();
 		auto kmerx = kmer.extract(&g);
-
+		//auto finish1 = chrono::high_resolution_clock::now();
+		//cout << "k_mer extraction seq:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish1 - start1).count() / 1e6 << " ms\n";
+		//start1 = chrono::high_resolution_clock::now();
 		int position = mapping::map_to_reference(&kmer0, &kmerx);
+		//finish1 = chrono::high_resolution_clock::now();
+		//cout << "mapping:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish1 - start1).count() / 1e6 << " ms\n";
 		if (position != -99999) {
-			//cout << "\npozicija unutar reference gdje bi se trebali poceti preklapati:	" << positionx << "	+-10 mjesta" << "\n";
+			cout <<"string:	"<< counter << "\nNORMAL preklapanje:	" << position << "	+-20 mjesta" << "\n";
 			pokrivenost1.insert(std::pair<int, int>(position, counter));
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx));
+			continue; //don't search the reverse if it is mapped
 			///get aligned strings
 			///map mutations
 		}
-		// COMPLEMENT use is obsolete
-		/*cout << "\ncomplement:	";
-		auto kmery = kmer.extract_complement(&g);
+		// REVERSE NEEDED, some sequences are in reverse
+		Genome gr = Genome(counter);
+		auto ir = i;
+		reverse(ir.begin(), ir.end());
+		gr.genomeString = ir;
+		auto kmery = kmer.extract_complement(&gr);
 		int positiony = mapping::map_to_reference(&kmer0, &kmery);
 		if (positiony != -99999) {
-			cout << "\npozicija unutar reference gdje bi se trebali poceti preklapati:	" << positiony << "	+-10 mjesta" << "\n";
+			cout <<"string:	"<< counter << "\nREVERSE  preklapanje:	" << positiony << "	+-20 mjesta" << "\n";
 			pokrivenost1.insert(std::pair<int, int>(positiony, counter));
+			continue;
 			///get aligned strings
 			///map mutations
 		}
-		*/
+		/* COMPLEMENT FOUND NOT IMPORTANT AGAIN
+		auto kmerz = kmer.extract_complement(&gr);
+		int positionz = mapping::map_to_reference(&kmer0, &kmerz);
+		if (positionz != -99999) {
+			cout << "string:	" << counter << "\nREVERSE complement preklapanje:	" << positionz << "	+-20 mjesta" << "\n";
+			pokrivenost1.insert(std::pair<int, int>(positionz, counter));
+			///get aligned strings
+			///map mutations
+		}
+		auto kmerw = kmer.extract_complement(&g);
+		int positionw = mapping::map_to_reference(&kmer0, &kmerw);
+		if (positiony != -99999) {
+			cout << "string:	" << counter << "\nNORMAL complement preklapanje:	" << positionw << "	+-20 mjesta" << "\n";
+			pokrivenost1.insert(std::pair<int, int>(positionw, counter));
+			///get aligned strings
+			///map mutations
+		}*/
 	}
 
 
@@ -165,8 +192,8 @@ void main(int argc, char** argv){
 		cout << "\nPosition:	" << i.first << "	string:	" << i.second;
 	}
 
-		//int x;
-		//cin >> x;
+		int x;
+		cin >> x;
 
 		///mutation_test();
 
