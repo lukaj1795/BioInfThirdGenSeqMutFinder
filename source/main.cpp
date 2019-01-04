@@ -149,7 +149,7 @@ void main(int argc, char** argv){
 		}*/
 	}
 
-
+	int counterinjo = 0;
 	for (auto seq_K : sequence_kmers){
 		
 		auto pos = seq_K.first;
@@ -160,19 +160,22 @@ void main(int argc, char** argv){
 			if (kmer0[i].position > pos){
 				for (int j = 0; j < kmers.size();j++){
 					if (g1.genomeString.length() > kmer0[i].position + kmers[j].position){
-						auto kmer_ref = kmer0[i - 1 + j];
+						auto kmer_ref = kmer0[i - 3];
 						///std::cerr << "\n";
 						///std::cerr << kmer_ref.string << "\n";
 						///std::cerr << kmers[j].string << "\n";
 						auto aligned = Alignment::Align(kmer_ref, kmers[j]);
-						/*if (aligned.second.size()){
-							std::cerr << aligned.second[0] << "\n";
-							std::cerr << aligned.second[1] << "\n";
-							}*/
-						MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map);
+						if (!aligned.second.empty()){
+							MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map);
+							}
 						}
 					}
-				break;
+				//break;
+				counterinjo++;
+				if (counterinjo > ((int)kmers.size()+3)) {
+					counterinjo = 0;
+					break;
+				}
 				}
 			
 			}
