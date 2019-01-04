@@ -9,9 +9,12 @@ const int INSERT = 1;
 const int DELETE = 2;
 
 namespace Alignment{
-	std::vector<std::string> Align(Kmer reference, Kmer sequence){
 
-		
+	int count = 0;
+
+	std::pair<int,std::vector<std::string>> Align(Kmer reference, Kmer sequence){
+
+		int offset = 0;
 		std::vector<std::string> aligned_string;
 		auto kmer_ref = reference;
 		auto kmer_seq = sequence;
@@ -74,7 +77,7 @@ namespace Alignment{
 					///get first character
 					ref += kmer_ref.string[index / column];
 					seq += kmer_seq.string[index % column];
-
+					count = 0;
 					//backtracking
 					Backtrack(operations, matrix, column, index, kmer_ref.string, kmer_seq.string, ref, seq);
 					///we need to get the string in right order
@@ -91,13 +94,14 @@ namespace Alignment{
 					//std::cout <<"seq:	"<< kmer_seq.string << "\n" << "\nAlignment\n";
 					//std::cout <<"ref:	"<< ref/*.substr(0, len) */ << '\n';
 					//std::cout <<"seq:	"<< seq/*.substr(0, len)*/ << '\n' << "\n";
-					
+					//offset = index/column - count/column;
 				}
-		return aligned_string;
+		return std::make_pair(offset,aligned_string);
 	} 
 
 
 	void Backtrack(std::vector<int>operations, std::vector<int>matrix, int column, int index, std::string const &ref, std::string const &seq, std::string &ref_align, std::string &seq_align){
+
 		while (matrix[index] != 0){
 			switch (operations[index])
 				{
@@ -121,6 +125,6 @@ namespace Alignment{
 
 				}
 			}
-		
+		count = index;
 		}
 }

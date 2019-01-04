@@ -28,13 +28,13 @@ void mutation_test(){
 	int pos = mapping::map_to_reference(&kmer1, &kmer2); //alternative mapping is obsolete, map to reference requires atleast 5 exact kmers within sequences to find position
 	std::cout << pos << "\n";
 	std::map<int, std::vector<MutationFinder::MutationOutput>> map;
-	for (int i = 0; i < kmer2.size(); i++){
+	for (int i = 0; i < (int)kmer2.size(); i++){
 		auto ali = Alignment::Align(kmer1[i], kmer2[i]);
-		MutationFinder::map_mutations(kmer1[i].position, ali, map);
+		MutationFinder::map_mutations(kmer1[i].position+ali.first, ali.second, map);
 
-		if (ali.size()>0){
-			std::cout << ali[0] << "\n";
-			std::cout << ali[1] << "\n";
+		if (ali.second.size()>0){
+			std::cout << ali.second[0] << "\n";
+			std::cout << ali.second[1] << "\n";
 			}
 		}
 
@@ -50,16 +50,18 @@ void mutation_test(){
 void main(int argc, char** argv){
 
 	//mutation_test();
-
-	int k = 20;
+	int w = 20;
+	int k = w;
 	auto start = chrono::high_resolution_clock::now();
 	std::map<int, std::vector<MutationFinder::MutationOutput>> map;
 	//reading fasta files
 	vector<string> V;
-	vector<string> references;
+	vector<string> references;	
+	std::string name="";
 	if (argc == 3){
 		ifstream file(argv[1]);
 		ifstream file2(argv[2]);
+		name = argv[1];
 		if (file.is_open()){
 			references = ReadFasta(file);
 			cout << "number of references:	" << references.size() << "\n";
@@ -82,7 +84,7 @@ void main(int argc, char** argv){
 	start = chrono::high_resolution_clock::now();
 	g1.genomeString = references[0];
 
-	Kmer_extraction kmer = Kmer_extraction(20, k);
+	Kmer_extraction kmer = Kmer_extraction(w, k);
 	auto kmer0 = kmer.extract(&g1);
 	finish = chrono::high_resolution_clock::now();
 	cout << "k_mer extraction reference:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
@@ -91,20 +93,20 @@ void main(int argc, char** argv){
 	std::map<int, int> pokrivenost1;
 	std::map<int, std::vector<Kmer>> sequence_kmers; //keeping all the kmers, int is identifier
 	int counter = 0;
-	for (auto i : V) {
+	for (auto const& i : V) {
 		counter++;
-		cout << "\nstring:	" << counter;
+		//cout << "\nstring:	" << counter;
 		Genome g = Genome(counter);
 		g.genomeString = i;
 		auto kmerx = kmer.extract(&g);
-		sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(counter, kmerx));
-		int positionx = mapping::map_to_reference(&kmer0, &kmerx);
-		if (positionx != -99999) {
-			cout << "\npozicija unutar reference gdje bi se trebali poceti preklapati:	" << positionx << "	+-10 mjesta" << "\n";
-			pokrivenost1.insert(std::pair<int, int>(positionx, counter));
+
+		int position = mapping::map_to_reference(&kmer0, &kmerx);
+		if (position != -99999) {
+			//cout << "\npozicija unutar reference gdje bi se trebali poceti preklapati:	" << positionx << "	+-10 mjesta" << "\n";
+			pokrivenost1.insert(std::pair<int, int>(position, counter));
+			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx));
 			///get aligned strings
 			///map mutations
-
 		}
 		// COMPLEMENT use is obsolete
 		/*cout << "\ncomplement:	";
@@ -118,18 +120,50 @@ void main(int argc, char** argv){
 		}
 		*/
 	}
-		auto m = MutationFinder::MapToVector(map);
-		MutationFinder::output_to_file("lambda_mut.csv", m);
 
 
-		finish = chrono::high_resolution_clock::now();
-		cout << "Alignment:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
+	for (auto seq_K : sequence_kmers){
+		
+		auto pos = seq_K.first;
+		auto kmers = seq_K.second;
 
 
-		for (auto i : pokrivenost1) {
-			cout << "\nPosition:	" << i.first << "	string:	" << i.second;
-
+		for (int i = 0; i < kmer0.size(); i++){
+			if (kmer0[i].position > pos){
+				for (int j = 0; j < kmers.size();j++){
+					auto kmer_ref = kmer0[i - 1 + j];
+					///std::cerr << "\n";
+					///std::cerr << kmer_ref.string << "\n";
+					///std::cerr << kmers[j].string << "\n";
+					auto aligned = Alignment::Align(kmer_ref,kmers[j]);
+					/*if (aligned.second.size()){
+						std::cerr << aligned.second[0] << "\n";
+						std::cerr << aligned.second[1] << "\n";
+						}*/
+					MutationFinder::map_mutations(kmer_ref.position+aligned.first,aligned.second,map);
+					}
+				break;
+				}
+			
 			}
+
+		
+		}
+
+
+
+	auto m = MutationFinder::MapToVector(map);
+
+	MutationFinder::output_to_file(name.substr(0,name.length()-6)+"_mut.csv", m);
+
+
+	finish = chrono::high_resolution_clock::now();
+	cout << "Alignment:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
+
+
+	for (auto i : pokrivenost1) {			
+		cout << "\nPosition:	" << i.first << "	string:	" << i.second;
+	}
 
 		//int x;
 		//cin >> x;

@@ -22,12 +22,11 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 	std::map<int,Kmer> all_kmers;
 	std::set<Kmer> minimizer_lookup;
 	std::vector<Kmer> all_return;
-
 	/*the length of String*/
 	for (int j = 0; j <= n - window_size; ++j) {
 		/* cycle over the window till k-mers of length, k, can still be made */
 		for (int i = j; i < j + w; i = i + 1) {
-			minimizer_lookup.insert(Kmer(sequence->genomeString.substr(i, k), i, sequence->identifier));
+			minimizer_lookup.insert(Kmer(std::move(sequence->genomeString.substr(i, k)), i, sequence->identifier));
 		}
 		/*only smallest k-mer will become minimizer of the given window*/
 		auto someElementIterator = minimizer_lookup.begin();
@@ -71,7 +70,7 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 		all_kmers.insert(std::pair<int, Kmer>(elem.position, elem));
 	}
 	for (auto i : all_kmers) {
-		all_return.push_back(i.second);
+		all_return.push_back(std::move(i.second));
 	}
 	return all_return;
 };

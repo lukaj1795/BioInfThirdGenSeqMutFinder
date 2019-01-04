@@ -15,10 +15,8 @@ std::map<char, int> order_map_even = {
 		{ 'G', 0 }
 	};
 
-Kmer::Kmer(std::string s, int p, int i) {
-	identifier = i;
-	string = s;
-	position = p;
+Kmer::Kmer(std::string s, int p, int i):identifier(i),string(std::move(s)),position(p) {
+
 	ordering_number_for_string = 0;
 
 	/*We assign the values 0, 1, 2, 3 to C, A, T, G, respectively,
@@ -42,6 +40,7 @@ Kmer::Kmer() {
 	position = 0;
 	string = "";
 }
+
 bool Kmer::is_equal_to(Kmer kmer2) {
 	if (this->string == kmer2.string && this->position == kmer2.position && this->identifier == kmer2.identifier) {
 		return true;

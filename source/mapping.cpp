@@ -16,12 +16,12 @@ namespace mapping {
 		{ 'G', 0 }
 	};
 	std::map<char, int> k2_count = {
-	{ 'C', 0 },
-	{ 'A', 0 },
-	{ 'T', 0 },
-	{ 'G', 0 }
+		{ 'C', 0 },
+		{ 'A', 0 },
+		{ 'T', 0 },
+		{ 'G', 0 }
 	};
-
+	std::vector<char> bases = { 'A', 'C', 'T', 'G' };
 	int map_to_reference(std::vector<Kmer>* reference, std::vector<Kmer>* sequence)
 	{
 
@@ -34,7 +34,7 @@ namespace mapping {
 		std::vector<int> ref_pos;
 		std::vector<int> seq_pos;
 		std::map <int,Kmer_mapping> matches;
-		std::vector<Kmer>::iterator speed_up;
+		//std::vector<Kmer>::iterator speed_up;
 		counter = 0;
 		int step = 5;
 
@@ -170,22 +170,22 @@ namespace mapping {
 		return error;
 	}*/
 
-	bool mapping::check_match(Kmer k1, Kmer k2) {
+	bool mapping::check_match(const Kmer &k1, const Kmer &k2) {
 		int mutation_number = 2;
-		for (auto it = k1_count.begin(); it != k1_count.end(); it++) {
-			auto a = *it;
-			k1_count.at(a.first) = 0;
-			k2_count.at(a.first) = 0;
+		for (auto a:bases) {
+			k1_count[a] = 0;
+			k2_count[a] = 0;
 		}
-		int j = 0;
+
+		//int j = 0;
 		for (std::string::size_type i = 0; i < k1.string.size(); ++i) {
-			j=k1_count.at(k1.string[i]);
-			k1_count.at(k1.string[i]) = ++j;
-			j=k2_count.at(k2.string[i]);
-			k2_count.at(k2.string[i]) = ++j;
+			//j=k1_count.at(k1.string[i]);
+			k1_count[k1.string[i]]+=1;
+			//j=k2_count.at(k2.string[i]);
+			k2_count[k2.string[i]]+=1;
 		}
 		//finished counting;
-		if (abs(k1_count.at('A') - k2_count.at('A')) + abs(k1_count.at('T') - k2_count.at('T')) + abs(k1_count.at('C') - k2_count.at('C')) + abs(k1_count.at('G') - k2_count.at('G')) > mutation_number) {
+		if (abs(k1_count['A'] - k2_count['A']) + abs(k1_count['T'] - k2_count['T']) + abs(k1_count['C'] - k2_count['C']) + abs(k1_count['G'] - k2_count['G']) > mutation_number) {
 			return false;
 		}
 		return true;

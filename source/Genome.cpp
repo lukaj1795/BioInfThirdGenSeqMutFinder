@@ -1,6 +1,5 @@
 #include"Genome.h"
 
-	Genome::Genome(int i){
-		identifier = i;
+	Genome::Genome(int i):identifier(i){
 	}
 
