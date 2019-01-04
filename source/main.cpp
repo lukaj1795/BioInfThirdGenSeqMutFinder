@@ -92,7 +92,8 @@ void main(int argc, char** argv){
 
 	start = chrono::high_resolution_clock::now();
 	std::map<int, int> pokrivenost1;
-	std::map<int, std::vector<Kmer>> sequence_kmers; //keeping all the kmers, int is identifier
+	std::map<int, std::vector<Kmer>> sequence_kmers;
+	std::map<int, std::vector<Kmer>> sequence_kmersr;//keeping all the kmers, int is identifier
 	int counter = 0;
 	for (auto const& i : V) {
 		counter++;
@@ -108,7 +109,7 @@ void main(int argc, char** argv){
 		//finish1 = chrono::high_resolution_clock::now();
 		//cout << "mapping:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish1 - start1).count() / 1e6 << " ms\n";
 		if (position != -99999) {
-			cout <<"string:	"<< counter << "\nNORMAL preklapanje:	" << position << "	+-20 mjesta" << "\n";
+			//cout <<"string:	"<< counter << "\nNORMAL preklapanje:	" << position << "	+-20 mjesta" << "\n";
 			pokrivenost1.insert(std::pair<int, int>(position, counter));
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx));
 			continue; //don't search the reverse if it is mapped
@@ -123,8 +124,9 @@ void main(int argc, char** argv){
 		auto kmery = kmer.extract_complement(&gr);
 		int positiony = mapping::map_to_reference(&kmer0, &kmery);
 		if (positiony != -99999) {
-			cout <<"string:	"<< counter << "\nREVERSE  preklapanje:	" << positiony << "	+-20 mjesta" << "\n";
+			//cout <<"string:	"<< counter << "\nREVERSE  preklapanje:	" << positiony << "	+-20 mjesta" << "\n";
 			pokrivenost1.insert(std::pair<int, int>(positiony, counter));
+			sequence_kmersr.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery));
 			continue;
 			///get aligned strings
 			///map mutations
@@ -177,6 +179,28 @@ void main(int argc, char** argv){
 		
 		}
 
+	for (auto seq_K2 : sequence_kmersr){
+
+		auto pos = seq_K2.first;
+		auto kmers = seq_K2.second;
+
+
+		for (int i = 0; i < kmer0.size(); i++){
+			if (kmer0[i].position > pos){
+				for (int j = 0; j < kmers.size(); j++){
+					auto kmer_ref = kmer0[i - 1 + j];
+
+					auto aligned = Alignment::Align(kmer_ref, kmers[j]);
+
+					MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map);
+					}
+				break;
+				}
+
+			}
+
+
+		}
 
 
 	auto m = MutationFinder::MapToVector(map);
@@ -192,8 +216,7 @@ void main(int argc, char** argv){
 		cout << "\nPosition:	" << i.first << "	string:	" << i.second;
 	}
 
-		int x;
-		cin >> x;
+
 
 		///mutation_test();
 

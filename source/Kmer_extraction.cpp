@@ -69,6 +69,7 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 	for (auto & elem : end_kmers_right) {
 		all_kmers.insert(std::pair<int, Kmer>(elem.position, elem));
 	}
+	all_return.reserve(all_kmers.size());
 	for (auto i : all_kmers) {
 		all_return.push_back(std::move(i.second));
 	}
