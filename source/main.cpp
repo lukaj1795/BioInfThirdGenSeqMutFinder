@@ -92,8 +92,7 @@ void main(int argc, char** argv){
 
 	start = chrono::high_resolution_clock::now();
 	std::map<int, int> pokrivenost1;
-	std::map<int, std::vector<Kmer>> sequence_kmers;
-	std::map<int, std::vector<Kmer>> sequence_kmersr;//keeping all the kmers, int is identifier
+	std::map<int, std::vector<Kmer>> sequence_kmers;//keeping all the kmers, int is identifier
 	int counter = 0;
 	for (auto const& i : V) {
 		counter++;
@@ -126,7 +125,7 @@ void main(int argc, char** argv){
 		if (positiony != -99999) {
 			//cout <<"string:	"<< counter << "\nREVERSE  preklapanje:	" << positiony << "	+-20 mjesta" << "\n";
 			pokrivenost1.insert(std::pair<int, int>(positiony, counter));
-			sequence_kmersr.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery));
+			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery));
 			continue;
 			///get aligned strings
 			///map mutations
@@ -160,16 +159,18 @@ void main(int argc, char** argv){
 		for (int i = 0; i < kmer0.size(); i++){
 			if (kmer0[i].position > pos){
 				for (int j = 0; j < kmers.size();j++){
-					auto kmer_ref = kmer0[i - 1 + j];
-					///std::cerr << "\n";
-					///std::cerr << kmer_ref.string << "\n";
-					///std::cerr << kmers[j].string << "\n";
-					auto aligned = Alignment::Align(kmer_ref,kmers[j]);
-					/*if (aligned.second.size()){
-						std::cerr << aligned.second[0] << "\n";
-						std::cerr << aligned.second[1] << "\n";
-						}*/
-					MutationFinder::map_mutations(kmer_ref.position+aligned.first,aligned.second,map);
+					if (g1.genomeString.length() > kmer0[i].position + kmers[j].position){
+						auto kmer_ref = kmer0[i - 1 + j];
+						///std::cerr << "\n";
+						///std::cerr << kmer_ref.string << "\n";
+						///std::cerr << kmers[j].string << "\n";
+						auto aligned = Alignment::Align(kmer_ref, kmers[j]);
+						/*if (aligned.second.size()){
+							std::cerr << aligned.second[0] << "\n";
+							std::cerr << aligned.second[1] << "\n";
+							}*/
+						MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map);
+						}
 					}
 				break;
 				}
@@ -179,28 +180,7 @@ void main(int argc, char** argv){
 		
 		}
 
-	for (auto seq_K2 : sequence_kmersr){
-
-		auto pos = seq_K2.first;
-		auto kmers = seq_K2.second;
-
-
-		for (int i = 0; i < kmer0.size(); i++){
-			if (kmer0[i].position > pos){
-				for (int j = 0; j < kmers.size(); j++){
-					auto kmer_ref = kmer0[i - 1 + j];
-
-					auto aligned = Alignment::Align(kmer_ref, kmers[j]);
-
-					MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map);
-					}
-				break;
-				}
-
-			}
-
-
-		}
+	
 
 
 	auto m = MutationFinder::MapToVector(map);

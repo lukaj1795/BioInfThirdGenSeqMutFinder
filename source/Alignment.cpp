@@ -69,7 +69,7 @@ namespace Alignment{
 					}
 				}
 
-				if (max >= (n * 4 - 4 - 2 * 2+1)) { //if only 1 mutation happens
+				if (max >= (n -1)*4 - Genome::DELETE ) { //if only 1 mutation happens
 					int index = bestIndex;
 					std::string ref = "";
 					std::string seq = "";
