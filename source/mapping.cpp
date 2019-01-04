@@ -9,7 +9,7 @@
 
 namespace mapping {
 	int error = -99999;
-	/*
+	
 	std::map<char, int> k1_count = {
 		{ 'C', 0 },
 		{ 'A', 0 },
@@ -21,7 +21,7 @@ namespace mapping {
 		{ 'A', 0 },
 		{ 'T', 0 },
 		{ 'G', 0 }
-	};*/
+	};
 	std::vector<char> bases = { 'A', 'C', 'T', 'G' };
 	int map_to_reference(std::vector<Kmer>* reference, std::vector<Kmer>* sequence)
 	{
@@ -54,7 +54,7 @@ namespace mapping {
 			}
 			flag1 = 0;
 			for (auto kmer_seq_iterator = sequence->begin(); kmer_seq_iterator != sequence->end(); ++kmer_seq_iterator) {
-				auto kmer_seq = *kmer_seq_iterator;
+				auto kmer_seq = std::move(*kmer_seq_iterator);
 				flag1++;
 				if (flag1 < 5) {
 					continue;
@@ -170,10 +170,14 @@ namespace mapping {
 		}
 		return error;
 	}*/
-	/*
+	
 	bool mapping::check_match(const Kmer &k1, const Kmer &k2) {
 		int mutation_number = 2;
-		for (auto a:bases) {
+		///maybe unnecessary
+		if (k1.ordering_number_for_string == k2.ordering_number_for_string){
+			return true;
+			}
+		for (auto &a:bases) {
 			k1_count[a] = 0;
 			k2_count[a] = 0;
 		}
@@ -191,5 +195,5 @@ namespace mapping {
 		}
 		return true;
 	}
-	*/
+	
 }

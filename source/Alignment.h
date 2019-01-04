@@ -10,5 +10,6 @@ namespace Alignment{
 
 	void Backtrack(std::vector<int>operation, std::vector<int>matrix, int column, int index,std::string const &ref, std::string const &seq, std::string &ref_align, std::string &seq_align);
 
+	void init_vectors(int k);
 
 }

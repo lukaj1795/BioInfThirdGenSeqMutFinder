@@ -14,6 +14,8 @@
 
 using namespace std;
 using namespace FASTAUtility;
+using namespace mapping;
+
 
 //simple test for mutation finder
 void mutation_test(){
@@ -55,6 +57,7 @@ void main(int argc, char** argv){
 	int k = w;
 	auto start = chrono::high_resolution_clock::now();
 	std::map<int, std::vector<MutationFinder::MutationOutput>> map;
+	Alignment::init_vectors(k);
 	//reading fasta files
 	vector<string> V;
 	vector<string> references;	
@@ -158,18 +161,20 @@ void main(int argc, char** argv){
 
 		for (int i = 0; i < kmer0.size(); i++){
 			if (kmer0[i].position > pos){
-				for (int j = 0; j < kmers.size();j++){
+				for (int j = 0; j < kmers.size(); j++){
 					if (g1.genomeString.length() > kmer0[i].position + kmers[j].position){
 						auto kmer_ref = kmer0[i - 3];
 						///std::cerr << "\n";
 						///std::cerr << kmer_ref.string << "\n";
 						///std::cerr << kmers[j].string << "\n";
-						auto aligned = Alignment::Align(kmer_ref, kmers[j]);
-						if (!aligned.second.empty()){
-							MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map);
-							}
+						if (mapping::check_match(kmer_ref, kmers[j])){
+							auto aligned = Alignment::Align(kmer_ref, kmers[j]);
+							if (!aligned.second.empty()){
+								MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map);
+								}
 						}
 					}
+				}
 				//break;
 				counterinjo++;
 				if (counterinjo > ((int)kmers.size()+3)) {
