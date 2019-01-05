@@ -80,7 +80,28 @@ namespace MutationFinder{
 			for (auto mo : vm){
 				map[mo]++;
 				}
+			/*for (auto mout : map){
+				char mut = 'M';
 
+				switch (mout.first.mutation)
+					{
+					case INSERT:
+						mut = 'I';
+						break;
+					case DELETE:
+						mut = 'D';
+						break;
+					case SUBSTITUTION:
+						mut = 'X';
+						break;
+					default:
+						break;
+					}
+
+
+
+				std::cerr << mut << " " << mout.first.position << " " << mout.first.sign << " count" << mout.second<<"\n";
+				}*/
 			MutationOutput most;
 			int max=0;
 			//finds most often mutations

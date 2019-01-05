@@ -88,7 +88,7 @@ namespace Alignment{
 			seq += kmer_seq.string[index % column];
 			count = 0;
 			//backtracking
-			Backtrack(operations, matrix, column, index, kmer_ref.string, kmer_seq.string, ref, seq);
+			Backtrack(operations, matrix, index, kmer_ref.string, kmer_seq.string, ref, seq);
 			///we need to get the string in right order
 			std::reverse(ref.begin(), ref.end());
 			std::reverse(seq.begin(), seq.end());
@@ -109,7 +109,7 @@ namespace Alignment{
 		}
 
 
-	void Backtrack(std::vector<int>operations, std::vector<int>matrix, int column, int index, std::string const &ref, std::string const &seq, std::string &ref_align, std::string &seq_align){
+	void Backtrack(std::vector<int>operations, std::vector<int>matrix, int index, std::string const &ref, std::string const &seq, std::string &ref_align, std::string &seq_align){
 
 		while (matrix[index] != 0){
 			switch (operations[index])

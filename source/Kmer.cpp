@@ -1,7 +1,7 @@
 #include <string>
 #include <map>
 #include"Kmer.h"
-
+#include<iostream>
 std::map<char, int> order_map_odd = {
 		{ 'C', 0 },
 		{ 'A', 1 },
@@ -15,6 +15,18 @@ std::map<char, int> order_map_even = {
 		{ 'G', 0 }
 	};
 
+
+
+
+
+/*Kmer::Kmer(Kmer&& other):identifier(other.identifier),string(other.string),position(other.position){
+	this->ordering_number_for_string = other.ordering_number_for_string;
+	/*other.position = 0;
+	other.identifier = 0;
+	other.string = "";*/
+	
+	//}
+
 Kmer::Kmer(std::string s, int p, int i):identifier(i),string(std::move(s)),position(p) {
 
 	ordering_number_for_string = 0;
@@ -26,20 +38,16 @@ Kmer::Kmer(std::string s, int p, int i):identifier(i),string(std::move(s)),posit
 	int j = string.size()-1;
 	for (std::string::size_type i = 0; i < string.size(); ++i) {
 		if (i % 2 == 0) { //base is even numbered inside k-mer
-			ordering_number_for_string =10*ordering_number_for_string+order_map_even.at(string[i]);
+			ordering_number_for_string =(ordering_number_for_string<<2)+order_map_even.at(string[i]);
 		}
 		else { //base is odd numbered inside k-mer
-			ordering_number_for_string =10*ordering_number_for_string+order_map_odd.at(string[i]);
+			ordering_number_for_string =(ordering_number_for_string<<2)+order_map_odd.at(string[i]);
 		}
 	}
 
 }
 
-Kmer::Kmer() {
-	identifier = 0;
-	position = 0;
-	string = "";
-}
+//Kmer::Kmer() :identifier(0), position(0), string(" "){}
 
 bool Kmer::is_equal_to(Kmer kmer2) {
 	if (this->string == kmer2.string && this->position == kmer2.position && this->identifier == kmer2.identifier) {

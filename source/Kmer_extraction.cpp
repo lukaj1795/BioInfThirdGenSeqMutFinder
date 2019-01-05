@@ -57,8 +57,8 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 		someElementIterator = end_minimizer_lookup_right.begin();
 		value = *someElementIterator;
 		end_kmers_right.insert(value);
-		end_minimizer_lookup_left.clear();
-		end_minimizer_lookup_right.clear();
+		//end_minimizer_lookup_left.clear();
+		//end_minimizer_lookup_right.clear();
 	}
 
 	/*add only unique minimizers from end-minimizers to all_minimizers*/

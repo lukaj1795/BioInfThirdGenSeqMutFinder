@@ -54,7 +54,7 @@ void main(int argc, char** argv){
 
 	//mutation_test();
 	int w = 20;
-	int k = w;
+	int k = 20;
 	auto start = chrono::high_resolution_clock::now();
 	std::map<int, std::vector<MutationFinder::MutationOutput>> map;
 	Alignment::init_vectors(k);
@@ -86,7 +86,8 @@ void main(int argc, char** argv){
 	//g1.genomeString = "GTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGATGCATCAGCGAGCAGCGATCGTAAGACCGCTAGCTAAGCTCGGCCTACGATAACGACATCAGCTACGATGCATCGATCTGATCGAGCATGCTGAGCAGCGTACTATGCGTAGTCATGCTGAGTGTCTTGGTCAGCAAAATGCATCGATCGACATGGTGTTCGATCGTAAGACCGCTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGAGGTCGTCACGTTACTCACAAGCAT";
 	//g2.genomeString = "CGATCGTAAGACCGCTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGA";
 	start = chrono::high_resolution_clock::now();
-	g1.genomeString = references[0];
+	g1.genomeString.reserve(references[0].length());
+	g1.genomeString = std::move(references[0]);
 
 	Kmer_extraction kmer = Kmer_extraction(w, k);
 	auto kmer0 = kmer.extract(&g1);
@@ -94,14 +95,15 @@ void main(int argc, char** argv){
 	cout << "k_mer extraction reference:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
 
 	start = chrono::high_resolution_clock::now();
-	std::map<int, int> pokrivenost1;
+	//std::map<int, int> pokrivenost1;
 	std::map<int, std::vector<Kmer>> sequence_kmers;//keeping all the kmers, int is identifier
 	int counter = 0;
 	for (auto const& i : V) {
 		counter++;
 		//cout << "\nstring:	" << counter;
 		Genome g = Genome(counter);
-		g.genomeString = i;
+		g.genomeString.reserve(i.size());
+		g.genomeString = std::move(i);
 		//auto start1 = chrono::high_resolution_clock::now();
 		auto kmerx = kmer.extract(&g);
 		//auto finish1 = chrono::high_resolution_clock::now();
@@ -112,7 +114,7 @@ void main(int argc, char** argv){
 		//cout << "mapping:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish1 - start1).count() / 1e6 << " ms\n";
 		if (position != -99999) {
 			//cout <<"string:	"<< counter << "\nNORMAL preklapanje:	" << position << "	+-20 mjesta" << "\n";
-			pokrivenost1.insert(std::pair<int, int>(position, counter));
+			//pokrivenost1.insert(std::pair<int, int>(position, counter));
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx));
 			continue; //don't search the reverse if it is mapped
 			///get aligned strings
@@ -122,12 +124,13 @@ void main(int argc, char** argv){
 		Genome gr = Genome(counter);
 		auto ir = i;
 		reverse(ir.begin(), ir.end());
-		gr.genomeString = ir;
+		gr.genomeString.reserve(ir.length());
+		gr.genomeString = std::move(ir);
 		auto kmery = kmer.extract_complement(&gr);
 		int positiony = mapping::map_to_reference(&kmer0, &kmery);
 		if (positiony != -99999) {
 			//cout <<"string:	"<< counter << "\nREVERSE  preklapanje:	" << positiony << "	+-20 mjesta" << "\n";
-			pokrivenost1.insert(std::pair<int, int>(positiony, counter));
+			//pokrivenost1.insert(std::pair<int, int>(positiony, counter));
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery));
 			continue;
 			///get aligned strings
@@ -197,12 +200,12 @@ void main(int argc, char** argv){
 
 
 	finish = chrono::high_resolution_clock::now();
-	cout << "Alignment:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
+	//cout << "Alignment:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
 
 
-	for (auto i : pokrivenost1) {			
+	/*for (auto i : pokrivenost1) {			
 		cout << "\nPosition:	" << i.first << "	string:	" << i.second;
-	}
+	}*/
 
 
 
