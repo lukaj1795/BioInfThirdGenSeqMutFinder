@@ -105,7 +105,7 @@ namespace Alignment{
 			//std::cout <<"seq:	"<< seq/*.substr(0, len)*/ << '\n' << "\n";
 			//offset = index/column - count/column;
 			}
-		return std::make_pair(offset, aligned_string);
+		return std::make_pair(count/column, aligned_string);
 		}
 
 
