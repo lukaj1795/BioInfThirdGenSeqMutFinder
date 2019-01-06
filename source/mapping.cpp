@@ -13,13 +13,13 @@ namespace mapping {
 	namespace {
 		const int error = -99999;
 		const int mutation_number = 2;
-		std::map<char, int> k1_count = {
+		/*std::map<char, int> k1_count = {
 			{ 'C', 0 },
 			{ 'A', 0 },
 			{ 'T', 0 },
 			{ 'G', 0 }
 		};
-		/*std::map<char, int> k2_count = {
+		std::map<char, int> k2_count = {
 			{ 'C', 0 },
 			{ 'A', 0 },
 			{ 'T', 0 },
@@ -41,13 +41,18 @@ namespace mapping {
 		std::map <int,Kmer_mapping> matches;
 		//std::vector<Kmer>::iterator speed_up;
 		counter = 0;
-		int step = 7;
+		int step = 30;
 
 		Kmer kmer_ref = reference->front();
+		Kmer kmer_ref1 = kmer_ref;
+		Kmer kmer_ref2 = kmer_ref;
+		Kmer kmer_ref3 = kmer_ref;
+		Kmer kmer_ref4 = kmer_ref;
+		Kmer kmer_ref5 = kmer_ref;
+		Kmer kmer_ref6 = kmer_ref;
 		Kmer kmer_seq = sequence->front();
 		for (auto kmer_ref_iterator = reference->begin(); kmer_ref_iterator != reference->end(); ++kmer_ref_iterator) {
-			
-			kmer_ref = *kmer_ref_iterator;
+		
 			counter++;
 			if (match == 0) {
 				if (counter < step) {
@@ -55,9 +60,23 @@ namespace mapping {
 				}
 				counter = 0; //reset counter for skipping STEP number of references
 			}
-			if (match > 8) {
-				break;
+			if (std::next(kmer_ref_iterator, 1) == reference->end() || std::next(kmer_ref_iterator, 2) == reference->end() || std::next(kmer_ref_iterator, 3) == reference->end() || std::next(kmer_ref_iterator, 4) == reference->end() || std::next(kmer_ref_iterator, 5) == reference->end() || std::next(kmer_ref_iterator, 6) == reference->end()) {
+				return -99999;
 			}
+			kmer_ref = *kmer_ref_iterator;
+			auto kmer_ref1_it = std::next(kmer_ref_iterator, 1);
+			auto kmer_ref2_it = std::next(kmer_ref_iterator, 2);
+			auto kmer_ref3_it = std::next(kmer_ref_iterator, 3);
+			auto kmer_ref4_it = std::next(kmer_ref_iterator, 4);
+			auto kmer_ref5_it = std::next(kmer_ref_iterator, 5);
+			auto kmer_ref6_it = std::next(kmer_ref_iterator, 6);
+			Kmer kmer_ref1 = *kmer_ref1_it;
+			Kmer kmer_ref2 = *kmer_ref2_it;
+			Kmer kmer_ref3 = *kmer_ref3_it;
+			Kmer kmer_ref4 = *kmer_ref4_it;
+			Kmer kmer_ref5 = *kmer_ref5_it;
+			Kmer kmer_ref6 = *kmer_ref6_it;
+
 			flag1 = 0;
 			for (auto kmer_seq_iterator = sequence->begin(); kmer_seq_iterator != sequence->end(); ++kmer_seq_iterator) {
 				kmer_seq = *kmer_seq_iterator;
@@ -65,21 +84,25 @@ namespace mapping {
 				if (flag1 < 3) {
 					continue;
 				}
-				if (flag1 > 109) {
+				if (flag1 > 209) {
 					break;
 				}
 				//if (!mapping::check_match(kmer_ref, kmer_seq)) {
 					//continue;
 				//}
 				//auto mapped = Alignment::Align_int(kmer_ref, kmer_seq); //HERE IS BIGGEST TIME CONSUMER NEEDS TO BE CHANGED
-				auto mapped = (kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string);
+				auto mapped = (kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref1.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref2.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref3.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref4.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref5.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref6.ordering_number_for_string == kmer_seq.ordering_number_for_string);
 				//if (mapped > (kmer_size * 4 - 4 - 2 * 2)) { //VERY IMPORTANT!!! ALL THE VALUES OF ALREADY ALIGNED KMERS GET BACK HERE INSIDE VECTOR MAPPED- CAN BE USED FOR MUTATION FINDING
 				if(mapped){
 					counter++;
 
 					match++;
+					if (match > 7) {
+						return kmer_ref.position - kmer_seq.position;
+						//break;
+					}
 				
-					if(matches.find(kmer_seq.position) == matches.end())
+					/*if(matches.find(kmer_seq.position) == matches.end())
 					{// key kmer_seq.position doesn't exist
 						Kmer_mapping new_position = Kmer_mapping(kmer_seq.position, kmer_ref.position);
 						auto result = matches.insert(std::pair<int, Kmer_mapping>(kmer_seq.position, new_position));
@@ -87,12 +110,12 @@ namespace mapping {
 					}
 					else { //key already exists.. add new reference position to Kmer_mapping
 						matches.at(kmer_seq.position).add_position(kmer_ref.position);
-					}
+					}*/
 
 				}
 			}
 		}
-		if (match <= 5) {
+		/*if (match <= 5) {
 			return -99999;
 		}
 		for (auto it1 = seq_pos_match.begin(); it1 != seq_pos_match.end(); ++it1) {
@@ -120,7 +143,7 @@ namespace mapping {
 					}
 				}
 			}
-		}
+		}*/
 		//std::cout << "\nNema PREKLAPANJa!!	" << match;
 		return -99999;
 	}
