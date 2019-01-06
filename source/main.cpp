@@ -11,6 +11,7 @@
 #include <chrono>
 #include <map>
 #include "MutationFinder.h"
+#include <algorithm>
 
 using namespace std;
 using namespace FASTAUtility;
@@ -50,11 +51,11 @@ void mutation_test(){
 
 
 
-void main(int argc, char** argv){
+int main(int argc, char** argv){
 
 	//mutation_test();
-	int w = 20;
-	int k = 20;
+	int w = 15;
+	int k = 18;
 	auto start = chrono::high_resolution_clock::now();
 	std::map<int, std::vector<MutationFinder::MutationOutput>> map;
 	Alignment::init_vectors(k);
@@ -95,7 +96,7 @@ void main(int argc, char** argv){
 	cout << "k_mer extraction reference:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
 
 	start = chrono::high_resolution_clock::now();
-	//std::map<int, int> pokrivenost1;
+	std::map<int, int> pokrivenost1;
 	std::map<int, std::vector<Kmer>> sequence_kmers;//keeping all the kmers, int is identifier
 	int counter = 0;
 	for (auto const& i : V) {
@@ -114,7 +115,7 @@ void main(int argc, char** argv){
 		//cout << "mapping:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish1 - start1).count() / 1e6 << " ms\n";
 		if (position != -99999) {
 			//cout <<"string:	"<< counter << "\nNORMAL preklapanje:	" << position << "	+-20 mjesta" << "\n";
-			//pokrivenost1.insert(std::pair<int, int>(position, counter));
+			pokrivenost1.insert(std::pair<int, int>(position, counter));
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx));
 			continue; //don't search the reverse if it is mapped
 			///get aligned strings
@@ -130,7 +131,7 @@ void main(int argc, char** argv){
 		int positiony = mapping::map_to_reference(&kmer0, &kmery);
 		if (positiony != -99999) {
 			//cout <<"string:	"<< counter << "\nREVERSE  preklapanje:	" << positiony << "	+-20 mjesta" << "\n";
-			//pokrivenost1.insert(std::pair<int, int>(positiony, counter));
+			pokrivenost1.insert(std::pair<int, int>(positiony, counter));
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery));
 			continue;
 			///get aligned strings
@@ -200,16 +201,16 @@ void main(int argc, char** argv){
 
 
 	finish = chrono::high_resolution_clock::now();
-	//cout << "Alignment:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
+	cout << "Alignment:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
 
 
-	/*for (auto i : pokrivenost1) {			
+	for (auto i : pokrivenost1) {			
 		cout << "\nPosition:	" << i.first << "	string:	" << i.second;
-	}*/
+	}
 
 
 
 		///mutation_test();
-
+	return 0;
 }
 

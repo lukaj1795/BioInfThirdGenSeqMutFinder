@@ -9,20 +9,23 @@
 
 
 namespace mapping {
-	int error = -99999;
-	
-	std::map<char, int> k1_count = {
-		{ 'C', 0 },
-		{ 'A', 0 },
-		{ 'T', 0 },
-		{ 'G', 0 }
-	};
-	std::map<char, int> k2_count = {
-		{ 'C', 0 },
-		{ 'A', 0 },
-		{ 'T', 0 },
-		{ 'G', 0 }
-	};
+
+	namespace {
+		const int error = -99999;
+		const int mutation_number = 2;
+		std::map<char, int> k1_count = {
+			{ 'C', 0 },
+			{ 'A', 0 },
+			{ 'T', 0 },
+			{ 'G', 0 }
+		};
+		/*std::map<char, int> k2_count = {
+			{ 'C', 0 },
+			{ 'A', 0 },
+			{ 'T', 0 },
+			{ 'G', 0 }
+		};*/
+	}
 	//std::vector<char> bases = { 'A', 'C', 'T', 'G' };
 	int map_to_reference(std::vector<Kmer>* reference, std::vector<Kmer>* sequence)
 	{
@@ -151,8 +154,8 @@ namespace mapping {
 		return error;
 	}*/
 	
-	bool mapping::check_match(const Kmer &k1, const Kmer &k2) {
-		int mutation_number = 2;
+	bool check_match(const Kmer &k1, const Kmer &k2) {
+
 		///maybe unnecessary
 		if (k1.ordering_number_for_string == k2.ordering_number_for_string){
 			return true;
@@ -164,17 +167,16 @@ namespace mapping {
 		}
 
 		//int j = 0;
-		int diff = 0;
+
 		for (std::string::size_type i = 0; i < k1.string.size(); ++i) {
 			k1_count.at(k1.string[i])++;
 			k1_count.at(k2.string[i])--;
 		}
 		//return diff < mutation_number * 2;
 		//finished counting;
-		if (abs(k1_count['A'])+ abs(k1_count['T']) + abs(k1_count['C']) + abs(k1_count['G'])  > mutation_number*2) {
-			return false;
+		return !((abs(k1_count['A']) + abs(k1_count['T']) + abs(k1_count['C']) + abs(k1_count['G'])) > mutation_number * 2);
+
 		}
-		return true;
+
 	}
 	
-}
