@@ -22,11 +22,13 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 	std::map<int,Kmer> all_kmers;
 	std::set<Kmer> minimizer_lookup;
 	std::vector<Kmer> all_return;
+	auto & genomeString=sequence->genomeString;
+
 	/*the length of String*/
 	for (int j = 0; j <= n - window_size; ++j) {
 		/* cycle over the window till k-mers of length, k, can still be made */
 		for (int i = j; i < j + w; i = i + 1) {
-			minimizer_lookup.insert(Kmer(std::move(sequence->genomeString.substr(i, k)), i, sequence->identifier));
+			minimizer_lookup.insert(Kmer(std::move(genomeString.substr(i, k)), i, sequence->identifier));
 		}
 		/*only smallest k-mer will become minimizer of the given window*/
 		auto someElementIterator = minimizer_lookup.begin();
@@ -46,8 +48,8 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 		
 		/* cycle over the window k+u-1 till k-mers of length, k, can still be made */
 		for (int i = 0; i < u; i++) {
-			end_minimizer_lookup_left.insert(Kmer(sequence->genomeString.substr(i, k), i, sequence->identifier));
-			end_minimizer_lookup_right.insert(Kmer(sequence->genomeString.substr(n - k - i, k), n - k - i, sequence->identifier));
+			end_minimizer_lookup_left.insert(Kmer(genomeString.substr(i, k), i, sequence->identifier));
+			end_minimizer_lookup_right.insert(Kmer(genomeString.substr(n - k - i, k), n - k - i, sequence->identifier));
 		}
 
 		// Iterate over all minimizers at the left end, add the minimizer of given window only if it is unique
@@ -57,8 +59,8 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 		someElementIterator = end_minimizer_lookup_right.begin();
 		value = *someElementIterator;
 		end_kmers_right.insert(value);
-		//end_minimizer_lookup_left.clear();
-		//end_minimizer_lookup_right.clear();
+		end_minimizer_lookup_left.clear();
+		end_minimizer_lookup_right.clear();
 	}
 
 	/*add only unique minimizers from end-minimizers to all_minimizers*/

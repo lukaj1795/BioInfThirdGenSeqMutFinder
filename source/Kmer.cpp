@@ -36,12 +36,12 @@ Kmer::Kmer(std::string s, int p, int i):identifier(i),string(std::move(s)),posit
 	ordering for even numbered bases*/
 	/*if the base is even numbered*/
 	int j = string.size()-1;
-	for (std::string::size_type i = 0; i < string.size(); ++i) {
+	for (int i = 0; i < string.size(); ++i) {
 		if (i % 2 == 0) { //base is even numbered inside k-mer
-			ordering_number_for_string =(ordering_number_for_string<<2)+order_map_even.at(string[i]);
+			ordering_number_for_string =(ordering_number_for_string*4)+order_map_even[string[i]];
 		}
 		else { //base is odd numbered inside k-mer
-			ordering_number_for_string =(ordering_number_for_string<<2)+order_map_odd.at(string[i]);
+			ordering_number_for_string =(ordering_number_for_string*4)+order_map_odd[string[i]];
 		}
 	}
 
