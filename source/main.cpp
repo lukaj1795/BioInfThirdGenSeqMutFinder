@@ -44,10 +44,7 @@ void mutation_test(){
 
 	auto m = MutationFinder::MapToVector(map);
 	MutationFinder::output_to_file("mut.csv", m);
-
-	int x;
-	cin >> x;
-	}
+}
 
 
 
@@ -98,7 +95,6 @@ int main(int argc, char** argv){
 
 	g1.genomeString.clear();
 	start = chrono::high_resolution_clock::now();
-	std::map<int, int> pokrivenost1;
 	std::map<int, std::vector<Kmer>> sequence_kmers;//keeping all the kmers, int is identifier
 	int counter = 0;
 
@@ -108,20 +104,11 @@ int main(int argc, char** argv){
 		Genome g = Genome(counter);
 		g.genomeString.reserve(i.size());
 		g.genomeString = std::move(i);
-		//auto start1 = chrono::high_resolution_clock::now();
 		auto kmerx = kmer.extract(&g);
-		//auto finish1 = chrono::high_resolution_clock::now();
-		//cout << "k_mer extraction seq:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish1 - start1).count() / 1e6 << " ms\n";
-		//start1 = chrono::high_resolution_clock::now();
 		int position = mapping::map_to_reference(&kmer0, &kmerx);
-		//finish1 = chrono::high_resolution_clock::now();
-		//cout << "mapping:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish1 - start1).count() / 1e6 << " ms\n";
 		if (position != -99999) {
-			//cout <<"string:	"<< counter << "\nNORMAL preklapanje:	" << position << "	+-20 mjesta" << "\n";
-			pokrivenost1.insert(std::pair<int, int>(position, counter));
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx));
 			continue; //don't search the reverse if it is mapped
-
 		}
 		// REVERSE NEEDED, some sequences are in reverse
 		Genome gr = Genome(counter);
@@ -132,67 +119,53 @@ int main(int argc, char** argv){
 		auto kmery = kmer.extract_complement(&gr);
 		int positiony = mapping::map_to_reference(&kmer0, &kmery);
 		if (positiony != -99999) {
-			//cout <<"string:	"<< counter << "\nREVERSE  preklapanje:	" << positiony << "	+-20 mjesta" << "\n";
-			pokrivenost1.insert(std::pair<int, int>(positiony, counter));
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery));
 			continue;
-
 		}
-
 	}
 
 	int counterinjo = 0;
-	for (auto seq_K : sequence_kmers){
-		
+	int flag = 0;
+	for (auto seq_K : sequence_kmers) {
+
 		auto pos = seq_K.first;
+		if (pos < 0) {
+			continue;
+		}
 		auto kmers = seq_K.second;
-
-
-		for (int i = 0; i < kmer0.size(); i++){
-			if (kmer0[i].position > pos){
-				for (int j = 0; j < kmers.size(); j++){
-					if (len > kmer0[i].position + kmers[j].position){
-						auto kmer_ref = kmer0[i - 3];
-						///std::cerr << "\n";
-						///std::cerr << kmer_ref.string << "\n";
-						///std::cerr << kmers[j].string << "\n";
-						if (mapping::check_match(kmer_ref.string, kmers[j].string)){
+		counterinjo = 0;
+		flag = 0;
+		for (int i = 0; i < kmer0.size(); i++) {
+			if (kmer0[i].position + 15 > pos) {
+				flag++;
+				auto kmer_ref = kmer0[i];
+				for (int j = counterinjo; j < counterinjo + kmers.size()/5; j++) {
+					if (len > kmer0[i].position + kmers[j].position) {
+						if (mapping::check_match(kmer_ref.string, kmers[j].string)) {
 							auto aligned = Alignment::Align(kmer_ref.string, kmers[j].string);
-							if (!aligned.second.empty()){
+							if (!aligned.second.empty()) {
 								MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map);
-								}
+							}
 						}
 					}
 				}
-				//break;
-				counterinjo++;
-				if (counterinjo > ((int)kmers.size()+3)) {
-					counterinjo = 0;
-					break;
+				if (flag > kmers.size()/10) {
+					counterinjo++;
+					if (counterinjo + kmers.size() / 5 == kmers.size()) {
+						counterinjo--;
+					}
 				}
-				}
-			
 			}
-
-		
 		}
-
-	
-
+	}
 
 	auto m = MutationFinder::MapToVector(map);
 
 	MutationFinder::output_to_file(name.substr(0,name.length()-6)+"_mut.csv", m);
 
-
 	finish = chrono::high_resolution_clock::now();
 	cout << "Alignment:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
 
-
-	for (auto i : pokrivenost1) {			
-		cout << "\nPosition:	" << i.first << "	string:	" << i.second;
-	}
-		///mutation_test();
 	return 0;
 }
 
