@@ -154,13 +154,13 @@ namespace mapping {
 		return error;
 	}*/
 	
-	bool check_match(const Kmer &k1, const Kmer &k2) {
+	bool check_match(const std::string &k1, const std::string &k2) {
 
 		///maybe unnecessary
-		if (k1.ordering_number_for_string == k2.ordering_number_for_string){
+		/*if (k1.ordering_number_for_string == k2.ordering_number_for_string){
 			return true;
-			}
-		for (auto a : k1_count) {
+			}*/
+		/*for (auto a : k1_count) {
 			
 			k1_count.at(a.first) = 0;
 			//k2_count.at(a.first) = 0;
@@ -175,8 +175,15 @@ namespace mapping {
 		//return diff < mutation_number * 2;
 		//finished counting;
 		return !((abs(k1_count['A']) + abs(k1_count['T']) + abs(k1_count['C']) + abs(k1_count['G'])) > mutation_number * 2);
-
+		*/
+		int diff = 0;
+		for (int i = 0;i < k1.size();i++) {
+			diff += k1[i] != k2[i];
+		}
+		return diff < mutation_number * 2;
+		
 		}
 
 	}
+	
 	

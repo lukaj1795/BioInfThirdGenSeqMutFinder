@@ -8,7 +8,7 @@
 const int MATCH = 0;
 const int INSERT = 1;
 const int DELETE = 2;
-const int window = 4;
+const int radius = 2;
 namespace Alignment {
 
 		int count = 0;
@@ -20,7 +20,7 @@ namespace Alignment {
 		int column;
 		int size;
 
-		std::pair<int, std::vector<std::string>> Align(Kmer kmer_ref, Kmer kmer_seq) {
+		std::pair<int, std::vector<std::string>> Align(const std::string &kmer_ref,const std::string &kmer_seq) {
 
 
 			std::vector<std::string> aligned_string;
@@ -35,16 +35,16 @@ namespace Alignment {
 
 			for (int i = 1; i < row; i++) {
 
-				for (int j =std::max(1,i-window); j < column; j++) {
+				for (int j =std::max(1,i-radius); j < column; j++) {
 
 
-					if ((abs(i - j) > window)) {
+					if ((abs(i - j) > radius)) {
 						//std::cerr << (abs(i - j)) << "\n";
 						//std::cerr << index << "\n";
 						continue;
 					}
 					auto index = i * (column)+j;
-					int match_award = -Genome::SUB+(kmer_seq.string[j - 1] == kmer_ref.string[i - 1])*(4+Genome::SUB);
+					int match_award = -Genome::SUB+(kmer_seq[j - 1] == kmer_ref[i - 1])*(4+Genome::SUB);
 
 
 					operation[MATCH] = matrix[index - column - 1] + match_award;
@@ -85,11 +85,11 @@ namespace Alignment {
 				std::string seq = "";
 
 				///get first character
-				ref += kmer_ref.string[index / column];
-				seq += kmer_seq.string[index % column];
+				ref += kmer_ref[index / column];
+				seq += kmer_seq[index % column];
 				count = 0;
 				//backtracking
-				Backtrack(operations, matrix, index, kmer_ref.string, kmer_seq.string, ref, seq);
+				Backtrack(operations, matrix, index, kmer_ref, kmer_seq, ref, seq);
 				///we need to get the string in right order
 				std::reverse(ref.begin(), ref.end());
 				std::reverse(seq.begin(), seq.end());

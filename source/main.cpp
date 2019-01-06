@@ -33,7 +33,7 @@ void mutation_test(){
 	std::cout << pos << "\n";
 	std::map<int, std::vector<MutationFinder::MutationOutput>> map;
 	for (int i = 0; i < (int)kmer2.size(); i++){
-		auto ali = Alignment::Align(kmer1[i], kmer2[i]);
+		auto ali = Alignment::Align(kmer1[i].string, kmer2[i].string);
 		MutationFinder::map_mutations(kmer1[i].position+ali.first, ali.second, map);
 
 		if (ali.second.size()>0){
@@ -54,8 +54,8 @@ void mutation_test(){
 int main(int argc, char** argv){
 
 	//mutation_test();
-	int w = 15;
-	int k = 18;
+	int w = 11;
+	int k = 14;
 	auto start = chrono::high_resolution_clock::now();
 	std::map<int, std::vector<MutationFinder::MutationOutput>> map;
 	Alignment::init_vectors(k);
@@ -94,11 +94,14 @@ int main(int argc, char** argv){
 	auto kmer0 = kmer.extract(&g1);
 	finish = chrono::high_resolution_clock::now();
 	cout << "k_mer extraction reference:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
+	auto len = g1.genomeString.length();
 
+	g1.genomeString.clear();
 	start = chrono::high_resolution_clock::now();
 	std::map<int, int> pokrivenost1;
 	std::map<int, std::vector<Kmer>> sequence_kmers;//keeping all the kmers, int is identifier
 	int counter = 0;
+
 	for (auto const& i : V) {
 		counter++;
 		//cout << "\nstring:	" << counter;
@@ -118,8 +121,7 @@ int main(int argc, char** argv){
 			pokrivenost1.insert(std::pair<int, int>(position, counter));
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx));
 			continue; //don't search the reverse if it is mapped
-			///get aligned strings
-			///map mutations
+
 		}
 		// REVERSE NEEDED, some sequences are in reverse
 		Genome gr = Genome(counter);
@@ -134,26 +136,9 @@ int main(int argc, char** argv){
 			pokrivenost1.insert(std::pair<int, int>(positiony, counter));
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery));
 			continue;
-			///get aligned strings
-			///map mutations
+
 		}
-		/* COMPLEMENT FOUND NOT IMPORTANT AGAIN
-		auto kmerz = kmer.extract_complement(&gr);
-		int positionz = mapping::map_to_reference(&kmer0, &kmerz);
-		if (positionz != -99999) {
-			cout << "string:	" << counter << "\nREVERSE complement preklapanje:	" << positionz << "	+-20 mjesta" << "\n";
-			pokrivenost1.insert(std::pair<int, int>(positionz, counter));
-			///get aligned strings
-			///map mutations
-		}
-		auto kmerw = kmer.extract_complement(&g);
-		int positionw = mapping::map_to_reference(&kmer0, &kmerw);
-		if (positiony != -99999) {
-			cout << "string:	" << counter << "\nNORMAL complement preklapanje:	" << positionw << "	+-20 mjesta" << "\n";
-			pokrivenost1.insert(std::pair<int, int>(positionw, counter));
-			///get aligned strings
-			///map mutations
-		}*/
+
 	}
 
 	int counterinjo = 0;
@@ -166,13 +151,13 @@ int main(int argc, char** argv){
 		for (int i = 0; i < kmer0.size(); i++){
 			if (kmer0[i].position > pos){
 				for (int j = 0; j < kmers.size(); j++){
-					if (g1.genomeString.length() > kmer0[i].position + kmers[j].position){
+					if (len > kmer0[i].position + kmers[j].position){
 						auto kmer_ref = kmer0[i - 3];
 						///std::cerr << "\n";
 						///std::cerr << kmer_ref.string << "\n";
 						///std::cerr << kmers[j].string << "\n";
-						if (mapping::check_match(kmer_ref, kmers[j])){
-							auto aligned = Alignment::Align(kmer_ref, kmers[j]);
+						if (mapping::check_match(kmer_ref.string, kmers[j].string)){
+							auto aligned = Alignment::Align(kmer_ref.string, kmers[j].string);
 							if (!aligned.second.empty()){
 								MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map);
 								}
@@ -207,9 +192,6 @@ int main(int argc, char** argv){
 	for (auto i : pokrivenost1) {			
 		cout << "\nPosition:	" << i.first << "	string:	" << i.second;
 	}
-
-
-
 		///mutation_test();
 	return 0;
 }
