@@ -100,7 +100,10 @@ int main(int argc, char** argv){
 
 	for (auto const& i : V) {
 		counter++;
-		//cout << "\nstring:	" << counter;
+		if (counter % 200 == 0) {
+			cout << "\nstring:	" << counter;
+		}
+
 		Genome g = Genome(counter);
 		g.genomeString.reserve(i.size());
 		g.genomeString = std::move(i);
@@ -138,6 +141,8 @@ int main(int argc, char** argv){
 		for (int i = 0; i < kmer0.size(); i++) {
 			if (kmer0[i].position + 15 > pos) {
 				flag++;
+				if (flag > kmers.back().position + kmers.size()/10)
+					break;
 				auto kmer_ref = kmer0[i];
 				for (int j = counterinjo; j < counterinjo + kmers.size()/5; j++) {
 					if (len > kmer0[i].position + kmers[j].position) {
@@ -158,8 +163,12 @@ int main(int argc, char** argv){
 			}
 		}
 	}
+	sequence_kmers.clear();
+	kmer0.clear();
 
 	auto m = MutationFinder::MapToVector(map);
+
+	map.clear();
 
 	MutationFinder::output_to_file(name.substr(0,name.length()-6)+"_mut.csv", m);
 

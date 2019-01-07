@@ -41,16 +41,9 @@ namespace mapping {
 		std::map <int,Kmer_mapping> matches;
 		//std::vector<Kmer>::iterator speed_up;
 		counter = 0;
-		int step = 30;
-
-		Kmer kmer_ref = reference->front();
-		Kmer kmer_ref1 = kmer_ref;
-		Kmer kmer_ref2 = kmer_ref;
-		Kmer kmer_ref3 = kmer_ref;
-		Kmer kmer_ref4 = kmer_ref;
-		Kmer kmer_ref5 = kmer_ref;
-		Kmer kmer_ref6 = kmer_ref;
-		Kmer kmer_seq = sequence->front();
+		int step = 100;
+		bool mapped;
+	
 		for (auto kmer_ref_iterator = reference->begin(); kmer_ref_iterator != reference->end(); ++kmer_ref_iterator) {
 		
 			counter++;
@@ -60,26 +53,23 @@ namespace mapping {
 				}
 				counter = 0; //reset counter for skipping STEP number of references
 			}
-			if (std::next(kmer_ref_iterator, 1) == reference->end() || std::next(kmer_ref_iterator, 2) == reference->end() || std::next(kmer_ref_iterator, 3) == reference->end() || std::next(kmer_ref_iterator, 4) == reference->end() || std::next(kmer_ref_iterator, 5) == reference->end() || std::next(kmer_ref_iterator, 6) == reference->end()) {
+			if (std::next(kmer_ref_iterator, 1) == reference->end() || std::next(kmer_ref_iterator, 2) == reference->end() || std::next(kmer_ref_iterator, 3) == reference->end() || std::next(kmer_ref_iterator, 4) == reference->end() || std::next(kmer_ref_iterator, 5) == reference->end() || std::next(kmer_ref_iterator, 6) == reference->end() || std::next(kmer_ref_iterator, 7) == reference->end() || std::next(kmer_ref_iterator, 8) == reference->end() || std::next(kmer_ref_iterator, 9) == reference->end() || std::next(kmer_ref_iterator, 10) == reference->end()) {
 				return -99999;
 			}
-			kmer_ref = *kmer_ref_iterator;
-			auto kmer_ref1_it = std::next(kmer_ref_iterator, 1);
+			auto kmer_ref = *kmer_ref_iterator;
 			auto kmer_ref2_it = std::next(kmer_ref_iterator, 2);
-			auto kmer_ref3_it = std::next(kmer_ref_iterator, 3);
 			auto kmer_ref4_it = std::next(kmer_ref_iterator, 4);
-			auto kmer_ref5_it = std::next(kmer_ref_iterator, 5);
 			auto kmer_ref6_it = std::next(kmer_ref_iterator, 6);
-			Kmer kmer_ref1 = *kmer_ref1_it;
+			auto kmer_ref8_it = std::next(kmer_ref_iterator, 8);
+			auto kmer_ref10_it = std::next(kmer_ref_iterator, 10);
 			Kmer kmer_ref2 = *kmer_ref2_it;
-			Kmer kmer_ref3 = *kmer_ref3_it;
-			Kmer kmer_ref4 = *kmer_ref4_it;
-			Kmer kmer_ref5 = *kmer_ref5_it;
+			Kmer kmer_ref4 = *kmer_ref6_it;
 			Kmer kmer_ref6 = *kmer_ref6_it;
-
+			Kmer kmer_ref8 = *kmer_ref8_it;
+			Kmer kmer_ref10 = *kmer_ref10_it;
 			flag1 = 0;
 			for (auto kmer_seq_iterator = sequence->begin(); kmer_seq_iterator != sequence->end(); ++kmer_seq_iterator) {
-				kmer_seq = *kmer_seq_iterator;
+				auto kmer_seq = *kmer_seq_iterator;
 				flag1++;
 				if (flag1 < 3) {
 					continue;
@@ -91,8 +81,11 @@ namespace mapping {
 					//continue;
 				//}
 				//auto mapped = Alignment::Align_int(kmer_ref, kmer_seq); //HERE IS BIGGEST TIME CONSUMER NEEDS TO BE CHANGED
-				auto mapped = (kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref1.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref2.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref3.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref4.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref5.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref6.ordering_number_for_string == kmer_seq.ordering_number_for_string);
+				if (match == 0)
+					mapped = (kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref2.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref4.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref6.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref8.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref10.ordering_number_for_string == kmer_seq.ordering_number_for_string);
 				//if (mapped > (kmer_size * 4 - 4 - 2 * 2)) { //VERY IMPORTANT!!! ALL THE VALUES OF ALREADY ALIGNED KMERS GET BACK HERE INSIDE VECTOR MAPPED- CAN BE USED FOR MUTATION FINDING
+				else
+					mapped = kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string;
 				if(mapped){
 					counter++;
 
