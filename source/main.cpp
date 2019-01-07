@@ -77,6 +77,11 @@ int main(int argc, char** argv){
 		file.close();
 		file2.close();
 		}
+	if (argc == 5) {
+		w = std::atoi(argv[3]);
+		k = std::atoi(argv[4]);
+	
+	}
 	auto finish = chrono::high_resolution_clock::now();
 	std::cout<< "Reading input files:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n\n";
 
@@ -117,7 +122,7 @@ int main(int argc, char** argv){
 		g.genomeString.reserve(i.size());
 		g.genomeString = std::move(i);
 		auto kmerx = kmer.extract(&g);
-		int position = mapping::alternative_mapping(kmer_position, &kmerx);
+		int position = mapping::alternative_mapping(kmer_position, kmerx);
 		if (position != -99999) {
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx));
 			continue; //don't search the reverse if it is mapped
@@ -129,7 +134,7 @@ int main(int argc, char** argv){
 		gr.genomeString.reserve(ir.length());
 		gr.genomeString = std::move(ir);
 		auto kmery = kmer.extract_complement(&gr);
-		int positiony = mapping::alternative_mapping(kmer_position, &kmery);
+		int positiony = mapping::alternative_mapping(kmer_position, kmery);
 		if (positiony != -99999) {
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery));
 			continue;
@@ -148,15 +153,15 @@ int main(int argc, char** argv){
 		auto kmers = seq_K.second;
 		counterinjo = 0;
 		flag = 0;
-		std::cout<< "rad na kmerima sekv " << print << "\n";
+		//std::cout<< "rad na kmerima sekv " << print << "\n";
 		print++;
 		for (int i = pos_index[pos]; i < kmer0.size(); i++) {
 			if (kmer0[i].position + 15 > pos) {
 				flag++;
-				if (flag > kmers.back().position + kmers.size()/10)
+				if (flag > kmers.back().position + kmers.size()/20)
 					break;
 				auto kmer_ref = kmer0[i];
-				for (int j = counterinjo; j < counterinjo + kmers.size()/5; j++) {
+				for (int j = counterinjo; j < counterinjo + kmers.size()/10; j++) {
 					if (len > kmer0[i].position + kmers[j].position) {
 						if (mapping::check_match(kmer_ref.string, kmers[j].string)) {
 							auto aligned = Alignment::Align(kmer_ref.string, kmers[j].string);
@@ -166,7 +171,7 @@ int main(int argc, char** argv){
 						}
 					}
 				}
-				if (flag > kmers.size()/10) {
+				if (flag > kmers.size()/20) {
 					counterinjo++;
 					if (counterinjo + kmers.size() / 5 == kmers.size()) {
 						counterinjo--;
@@ -182,10 +187,11 @@ int main(int argc, char** argv){
 
 	map.clear();
 
-	MutationFinder::output_to_file(name.substr(0,name.length()-6)+"_mut.csv", m);
+	
+	MutationFinder::output_to_file(std::to_string(w)+"w_"+std::to_string(k)+"k_"+name.substr(0,name.length()-6)+"_mut.csv", m);
 
 	finish = chrono::high_resolution_clock::now();
-	std::cout<< "Alignment:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
+	std::cout<< "Total:	" << std::chrono::duration_cast<chrono::milliseconds>(finish - start).count()  << " ms\n";
 
 	return 0;
 }

@@ -142,15 +142,15 @@ namespace mapping {
 		return -99999;
 	}
 
-	int alternative_mapping(const std::unordered_map<int,int> &reference, std::vector<Kmer>* sequence) {
+	int alternative_mapping(const std::unordered_map<int,int> &reference, const std::vector<Kmer> & sequence) {
 
 		int match = 0;
 
 		int counter = 0;
-		int threshold = 12;
+		int threshold = sequence[0].string.length();
 
 
-		for (auto seq = sequence->begin(); seq != sequence->end(); ++seq) {
+		for (auto seq = sequence.begin(); seq != sequence.end(); ++seq) {
 			auto seq_K = *seq;
 			auto ss = seq_K.ordering_number_for_string;
 			if (reference.find(ss)!=reference.end()) {
