@@ -60,7 +60,7 @@ int main(int argc, char** argv){
 	vector<string> V;
 	vector<string> references;	
 	std::string name="";
-	if (argc == 3){
+	if (argc >= 3){
 		ifstream file(argv[1]);
 		ifstream file2(argv[2]);
 		name = argv[1];
