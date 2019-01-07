@@ -50,6 +50,7 @@ Kmer::Kmer(std::string s, int p, int i):identifier(i),string(std::move(s)),posit
 //Kmer::Kmer() :identifier(0), position(0), string(" "){}
 
 bool Kmer::is_equal_to(Kmer kmer2) {
+	return ordering_number_for_string == kmer2.ordering_number_for_string;
 	if (this->string == kmer2.string && this->position == kmer2.position && this->identifier == kmer2.identifier) {
 		return true;
 	}

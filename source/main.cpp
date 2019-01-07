@@ -30,15 +30,15 @@ void mutation_test(){
 	auto kmer1 = kextraxt.extract(&g1);
 	auto kmer2 = kextraxt.extract(&g2);
 	int pos = mapping::map_to_reference(&kmer1, &kmer2); //alternative mapping is obsolete, map to reference requires atleast 5 exact kmers within sequences to find position
-	std::cout << pos << "\n";
+	std::cout<< pos << "\n";
 	std::map<int, std::vector<MutationFinder::MutationOutput>> map;
 	for (int i = 0; i < (int)kmer2.size(); i++){
 		auto ali = Alignment::Align(kmer1[i].string, kmer2[i].string);
 		MutationFinder::map_mutations(kmer1[i].position+ali.first, ali.second, map);
 
 		if (ali.second.size()>0){
-			std::cout << ali.second[0] << "\n";
-			std::cout << ali.second[1] << "\n";
+			std::cout<< ali.second[0] << "\n";
+			std::cout<< ali.second[1] << "\n";
 			}
 		}
 
@@ -66,19 +66,19 @@ int main(int argc, char** argv){
 		name = argv[1];
 		if (file.is_open()){
 			references = ReadFasta(file);
-			cout << "number of references:	" << references.size() << "\n";
+			std::cout<< "number of references:	" << references.size() << "\n";
 
 			}
 		if (file2.is_open()){
 			V = ReadFasta(file2);
-			cout << "number of sequences:	" << V.size() << "\n";
+			std::cout<< "number of sequences:	" << V.size() << "\n";
 
 			}
 		file.close();
 		file2.close();
 		}
 	auto finish = chrono::high_resolution_clock::now();
-	cout << "Reading input files:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n\n";
+	std::cout<< "Reading input files:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n\n";
 
 	Genome g1 = Genome(0); //reference has identifier 0
 	//g1.genomeString = "GTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGATGCATCAGCGAGCAGCGATCGTAAGACCGCTAGCTAAGCTCGGCCTACGATAACGACATCAGCTACGATGCATCGATCTGATCGAGCATGCTGAGCAGCGTACTATGCGTAGTCATGCTGAGTGTCTTGGTCAGCAAAATGCATCGATCGACATGGTGTTCGATCGTAAGACCGCTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGAGGTCGTCACGTTACTCACAAGCAT";
@@ -90,25 +90,34 @@ int main(int argc, char** argv){
 	Kmer_extraction kmer = Kmer_extraction(w, k);
 	auto kmer0 = kmer.extract(&g1);
 	finish = chrono::high_resolution_clock::now();
-	cout << "k_mer extraction reference:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
+	std::cout<< "k_mer extraction reference:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
 	auto len = g1.genomeString.length();
 
 	g1.genomeString.clear();
 	start = chrono::high_resolution_clock::now();
 	std::map<int, std::vector<Kmer>> sequence_kmers;//keeping all the kmers, int is identifier
 	int counter = 0;
+	std::unordered_map<int, int> kmer_position;
+	std::unordered_map<int, int> kmer_index;
+	std::unordered_map<int, int> pos_index;
+	for (int i = 0;i < kmer0.size();i++) {
+		kmer_position[kmer0[i].ordering_number_for_string] = kmer0[i].position;
+		kmer_index[kmer0[i].ordering_number_for_string] = i;
+		pos_index[kmer0[i].position] = i;
+	}
 
 	for (auto const& i : V) {
 		counter++;
-		if (counter % 200 == 0) {
-			cout << "\nstring:	" << counter;
+		if (counter % 500 == 0) {
+			finish = chrono::high_resolution_clock::now();
+			std::cout<< "\nstring:	" << counter <<" "<<std::chrono::duration_cast<chrono::seconds>(finish - start).count()  << " s\n";
 		}
 
 		Genome g = Genome(counter);
 		g.genomeString.reserve(i.size());
 		g.genomeString = std::move(i);
 		auto kmerx = kmer.extract(&g);
-		int position = mapping::map_to_reference(&kmer0, &kmerx);
+		int position = mapping::alternative_mapping(kmer_position, &kmerx);
 		if (position != -99999) {
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx));
 			continue; //don't search the reverse if it is mapped
@@ -120,15 +129,16 @@ int main(int argc, char** argv){
 		gr.genomeString.reserve(ir.length());
 		gr.genomeString = std::move(ir);
 		auto kmery = kmer.extract_complement(&gr);
-		int positiony = mapping::map_to_reference(&kmer0, &kmery);
+		int positiony = mapping::alternative_mapping(kmer_position, &kmery);
 		if (positiony != -99999) {
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery));
 			continue;
 		}
 	}
-
+	V.clear();
 	int counterinjo = 0;
 	int flag = 0;
+	int print = 0;
 	for (auto seq_K : sequence_kmers) {
 
 		auto pos = seq_K.first;
@@ -138,7 +148,9 @@ int main(int argc, char** argv){
 		auto kmers = seq_K.second;
 		counterinjo = 0;
 		flag = 0;
-		for (int i = 0; i < kmer0.size(); i++) {
+		std::cout<< "rad na kmerima sekv " << print << "\n";
+		print++;
+		for (int i = pos_index[pos]; i < kmer0.size(); i++) {
 			if (kmer0[i].position + 15 > pos) {
 				flag++;
 				if (flag > kmers.back().position + kmers.size()/10)
@@ -173,7 +185,7 @@ int main(int argc, char** argv){
 	MutationFinder::output_to_file(name.substr(0,name.length()-6)+"_mut.csv", m);
 
 	finish = chrono::high_resolution_clock::now();
-	cout << "Alignment:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
+	std::cout<< "Alignment:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
 
 	return 0;
 }

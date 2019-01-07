@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include "Kmer_mapping.h"
+#include <unordered_map>
 
 
 namespace mapping {
@@ -41,7 +42,7 @@ namespace mapping {
 		std::map <int,Kmer_mapping> matches;
 		//std::vector<Kmer>::iterator speed_up;
 		counter = 0;
-		int step = 100;
+		int step = 30;
 		bool mapped;
 	
 		for (auto kmer_ref_iterator = reference->begin(); kmer_ref_iterator != reference->end(); ++kmer_ref_iterator) {
@@ -60,13 +61,13 @@ namespace mapping {
 			auto kmer_ref2_it = std::next(kmer_ref_iterator, 2);
 			auto kmer_ref4_it = std::next(kmer_ref_iterator, 4);
 			auto kmer_ref6_it = std::next(kmer_ref_iterator, 6);
-			auto kmer_ref8_it = std::next(kmer_ref_iterator, 8);
-			auto kmer_ref10_it = std::next(kmer_ref_iterator, 10);
+			//auto kmer_ref8_it = std::next(kmer_ref_iterator, 8);
+			//auto kmer_ref10_it = std::next(kmer_ref_iterator, 10);
 			Kmer kmer_ref2 = *kmer_ref2_it;
 			Kmer kmer_ref4 = *kmer_ref6_it;
 			Kmer kmer_ref6 = *kmer_ref6_it;
-			Kmer kmer_ref8 = *kmer_ref8_it;
-			Kmer kmer_ref10 = *kmer_ref10_it;
+			//Kmer kmer_ref8 = *kmer_ref8_it;
+			//Kmer kmer_ref10 = *kmer_ref10_it;
 			flag1 = 0;
 			for (auto kmer_seq_iterator = sequence->begin(); kmer_seq_iterator != sequence->end(); ++kmer_seq_iterator) {
 				auto kmer_seq = *kmer_seq_iterator;
@@ -82,7 +83,7 @@ namespace mapping {
 				//}
 				//auto mapped = Alignment::Align_int(kmer_ref, kmer_seq); //HERE IS BIGGEST TIME CONSUMER NEEDS TO BE CHANGED
 				if (match == 0)
-					mapped = (kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref2.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref4.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref6.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref8.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref10.ordering_number_for_string == kmer_seq.ordering_number_for_string);
+					mapped = (kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref2.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref4.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref6.ordering_number_for_string == kmer_seq.ordering_number_for_string); //|| kmer_ref8.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref10.ordering_number_for_string == kmer_seq.ordering_number_for_string);
 				//if (mapped > (kmer_size * 4 - 4 - 2 * 2)) { //VERY IMPORTANT!!! ALL THE VALUES OF ALREADY ALIGNED KMERS GET BACK HERE INSIDE VECTOR MAPPED- CAN BE USED FOR MUTATION FINDING
 				else
 					mapped = kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string;
@@ -141,34 +142,30 @@ namespace mapping {
 		return -99999;
 	}
 
-	/*int alternative_mapping(std::vector<Kmer>* reference, std::vector<Kmer>* sequence) {
+	int alternative_mapping(const std::unordered_map<int,int> &reference, std::vector<Kmer>* sequence) {
 
 		int match = 0;
 
 		int counter = 0;
 		int threshold = 12;
 
-		for (auto kmer = reference->begin(); kmer != reference->end(); ++kmer) {
-			auto ref = *kmer;
-			counter = 0;
-			for (auto seq = sequence->begin(); seq != sequence->end(); ++seq) {
-				auto seq_K = *seq;
-				auto sr = ref.ordering_number_for_string;
-				auto ss = seq_K.ordering_number_for_string;
-				if (sr == ss) {
-					///std::cout << ref.string << " " << seq_K.string << "\n";
-					return ref.position - seq_K.position;
-				}
-				if (counter > threshold)
-				{
-					break;
-				}
-				counter++;
-			}
 
+		for (auto seq = sequence->begin(); seq != sequence->end(); ++seq) {
+			auto seq_K = *seq;
+			auto ss = seq_K.ordering_number_for_string;
+			if (reference.find(ss)!=reference.end()) {
+				///std::cout << ref.string << " " << seq_K.string << "\n";
+				return reference.at(ss) - seq_K.position;
+			}
+			if (counter > threshold)
+			{
+				break;
+			}
+			counter++;
 		}
+
 		return error;
-	}*/
+	}
 	
 	bool check_match(const std::string &k1, const std::string &k2) {
 
