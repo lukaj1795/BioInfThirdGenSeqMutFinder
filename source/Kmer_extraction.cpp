@@ -24,13 +24,13 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 	std::vector<Kmer> all_return;
 	auto & genomeString=sequence->genomeString;
 
-	/*the length of String*/
+	//the length of String
 	for (int j = 0; j <= n - window_size; ++j) {
-		/* cycle over the window till k-mers of length, k, can still be made */
+		// cycle over the window till k-mers of length, k, can still be made
 		for (int i = j; i < j + w; i = i + 1) {
 			minimizer_lookup.insert(Kmer(std::move(genomeString.substr(i, k)), i, sequence->identifier));
 		}
-		/*only smallest k-mer will become minimizer of the given window*/
+		//only smallest k-mer will become minimizer of the given window
 		auto someElementIterator = minimizer_lookup.begin();
 		auto value = *someElementIterator;
 		all_kmers.insert(std::pair<int, Kmer>(value.position,value));
@@ -46,7 +46,7 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 
 	for (int u = 1; u < w; ++u) {
 		
-		/* cycle over the window k+u-1 till k-mers of length, k, can still be made */
+		// cycle over the window k+u-1 till k-mers of length, k, can still be made 
 		for (int i = 0; i < u; i++) {
 			end_minimizer_lookup_left.insert(Kmer(genomeString.substr(i, k), i, sequence->identifier));
 			end_minimizer_lookup_right.insert(Kmer(genomeString.substr(n - k - i, k), n - k - i, sequence->identifier));
@@ -63,7 +63,7 @@ std::vector<Kmer> Kmer_extraction::extract(Genome *sequence) {
 		end_minimizer_lookup_right.clear();
 	}
 
-	/*add only unique minimizers from end-minimizers to all_minimizers*/
+	//add only unique minimizers from end-minimizers to all_minimizers
 	
 	for (auto & elem : end_kmers_left) {
 		all_kmers.insert(std::pair<int, Kmer>(elem.position, elem));
@@ -93,7 +93,7 @@ std::vector<Kmer> Kmer_extraction::extract_complement(Genome *sequence) {
 		{ 'T', 'A' },
 		{ 'G', 'C' }
 	};
-	for (auto i : sequence->genomeString) {
+	for (auto i : sequence->genomeString) { //create complement
 		complement += komplement.at(i);
 	}
 	Genome g = Genome(sequence->identifier);

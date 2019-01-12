@@ -86,22 +86,21 @@ int main(int argc, char** argv){
 	std::cout<< "Reading input files:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n\n";
 
 	Genome g1 = Genome(0); //reference has identifier 0
-	//g1.genomeString = "GTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGATGCATCAGCGAGCAGCGATCGTAAGACCGCTAGCTAAGCTCGGCCTACGATAACGACATCAGCTACGATGCATCGATCTGATCGAGCATGCTGAGCAGCGTACTATGCGTAGTCATGCTGAGTGTCTTGGTCAGCAAAATGCATCGATCGACATGGTGTTCGATCGTAAGACCGCTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGAGGTCGTCACGTTACTCACAAGCAT";
-	//g2.genomeString = "CGATCGTAAGACCGCTAGCTAAGCTCGGGGCATCGACTACAAAATTTCGAGTGATCGATGCCAGA";
+
 	start = chrono::high_resolution_clock::now();
 	g1.genomeString.reserve(references[0].length());
 	g1.genomeString = std::move(references[0]);
 
 	Kmer_extraction kmer = Kmer_extraction(w, k);
-	auto kmer0 = kmer.extract(&g1);
+	auto kmer0 = kmer.extract(&g1); //reference k-mer extraction
 	finish = chrono::high_resolution_clock::now();
 	std::cout<< "k_mer extraction reference:	" << std::chrono::duration_cast<chrono::nanoseconds>(finish - start).count() / 1e6 << " ms\n";
 	auto len = g1.genomeString.length();
 
 	g1.genomeString.clear();
 	start = chrono::high_resolution_clock::now();
-	std::map<int, std::vector<Kmer>> sequence_kmers;//keeping all the kmers, int is identifier
-	int counter = 0;
+	std::map<int, std::vector<Kmer>> sequence_kmers; //keeping all the k-mers of sequences for mapping, int is identifier
+	int counter = 0; //sequence counter for identification
 	std::unordered_map<int, int> kmer_position;
 	std::unordered_map<int, int> kmer_index;
 	std::unordered_map<int, int> pos_index;
@@ -113,68 +112,68 @@ int main(int argc, char** argv){
 
 	for (auto const& i : V) {
 		counter++;
-		if (counter % 500 == 0) {
+		if (counter % 500 == 0) { //checking progress
 			finish = chrono::high_resolution_clock::now();
 			std::cout<< "\nstring:	" << counter <<" "<<std::chrono::duration_cast<chrono::seconds>(finish - start).count()  << " s\n";
 		}
 
-		Genome g = Genome(counter);
+		Genome g = Genome(counter); //creating new sequence with identifier=counter
 		g.genomeString.reserve(i.size());
 		g.genomeString = std::move(i);
-		auto kmerx = kmer.extract(&g);
-		int position = mapping::alternative_mapping(kmer_position, kmerx);
-		if (position != -99999) {
-			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx));
-			continue; //don't search the reverse if it is mapped
+		auto kmerx = kmer.extract(&g); //extracting k-mers for sequence
+		int position = mapping::alternative_mapping(kmer_position, kmerx); //trying to find position of sequence inside the reference
+		if (position != -99999) { //if position not equal -99999 position is found
+			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx)); //save position for mutation finding, position isn't 100% accurate
+			continue; //don't search the reverse if sequence is mapped
 		}
-		// REVERSE NEEDED, some sequences are in reverse
+		// REVERSE COMPLEMENT NEEDED, some sequences are in reverse
 		Genome gr = Genome(counter);
 		auto ir = i;
-		reverse(ir.begin(), ir.end());
+		reverse(ir.begin(), ir.end()); //creating reverse string
 		gr.genomeString.reserve(ir.length());
 		gr.genomeString = std::move(ir);
-		auto kmery = kmer.extract_complement(&gr);
-		int positiony = mapping::alternative_mapping(kmer_position, kmery);
-		if (positiony != -99999) {
-			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery));
-			continue;
+		auto kmery = kmer.extract_complement(&gr); //extracting k-mers of strings complement!!
+		int positiony = mapping::alternative_mapping(kmer_position, kmery); //trying to find position of reverse complement
+		if (positiony != -99999) { //if position is find
+			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery)); //save the postion for mutation finding, position isn't 100% accurate
 		}
 	}
-	V.clear();
-	int counterinjo = 0;
-	int flag = 0;
-	int print = 0;
-	for (auto seq_K : sequence_kmers) {
 
-		auto pos = seq_K.first;
+	V.clear();
+	int shift = 0; //moving the sequence around the mapped position in the reference
+	int flag = 0;
+	//int print = 0;
+	for (auto seq_K : sequence_kmers) { //for every mapped sequence
+
+		auto pos = seq_K.first; //save the position to which it is aligned
 		if (pos < 0) {
 			continue;
 		}
-		auto kmers = seq_K.second;
-		counterinjo = 0;
+		auto kmers = seq_K.second; //k-mers of mapped sequence
+		shift = 0; //reset the shift for current sequence
 		flag = 0;
 		//std::cout<< "rad na kmerima sekv " << print << "\n";
-		print++;
+		//print++;
 		for (int i = pos_index[pos]; i < kmer0.size(); i++) {
-			if (kmer0[i].position + 15 > pos) {
+			if (kmer0[i].position + 15 > pos) { //start 15 positions earlier, mapping is not 100% accurate
 				flag++;
-				if (flag > kmers.back().position + kmers.size()/20)
+				if (flag > kmers.back().position + kmers.size()/20) //reference has been searched enough for this current sequence
 					break;
 				auto kmer_ref = kmer0[i];
-				for (int j = counterinjo; j < counterinjo + kmers.size()/10; j++) {
-					if (len > kmer0[i].position + kmers[j].position) {
-						if (mapping::check_match(kmer_ref.string, kmers[j].string)) {
-							auto aligned = Alignment::Align(kmer_ref.string, kmers[j].string);
-							if (!aligned.second.empty()) {
-								MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map);
+				for (int j = shift; j < shift + kmers.size()/10; j++) {
+					if (len > kmer0[i].position + kmers[j].position) { //if we are inside the reference
+						if (mapping::check_match(kmer_ref.string, kmers[j].string)) { //checking if referent k-mer and sequence k-mer are similar enough to enter the alignment process
+							auto aligned = Alignment::Align(kmer_ref.string, kmers[j].string); //alignment of two k-mers
+							if (!aligned.second.empty()) { //if only 1 mutation found, possible outcome for the each base : MATCH; INSERT; DELETE; SUBSTITUTION
+								MutationFinder::map_mutations(kmer_ref.position + aligned.first, aligned.second, map); //keep the alignment data
 							}
 						}
 					}
 				}
 				if (flag > kmers.size()/20) {
-					counterinjo++;
-					if (counterinjo + kmers.size() / 5 == kmers.size()) {
-						counterinjo--;
+					shift++; //when some amount of k-mers are checked for mutations, start shifting the sequence along the reference
+					if (shift + kmers.size() / 10 == kmers.size()) { //when the end of sequence is reached stop shifting
+						shift--; //shift stop
 					}
 				}
 			}
@@ -183,11 +182,11 @@ int main(int argc, char** argv){
 	sequence_kmers.clear();
 	kmer0.clear();
 
-	auto m = MutationFinder::MapToVector(map);
+	auto m = MutationFinder::MapToVector(map); //extraction of most often mutation (or MATCH) for each position of reference
 
 	map.clear();
 
-	
+	//print - csv
 	MutationFinder::output_to_file(std::to_string(w)+"w_"+std::to_string(k)+"k_"+name.substr(0,name.length()-6)+"_mut.csv", m);
 
 	finish = chrono::high_resolution_clock::now();

@@ -28,6 +28,7 @@ namespace mapping {
 		};*/
 	}
 	//std::vector<char> bases = { 'A', 'C', 'T', 'G' };
+
 	int map_to_reference(std::vector<Kmer>* reference, std::vector<Kmer>* sequence)
 	{
 
@@ -48,54 +49,48 @@ namespace mapping {
 		for (auto kmer_ref_iterator = reference->begin(); kmer_ref_iterator != reference->end(); ++kmer_ref_iterator) {
 		
 			counter++;
-			if (match == 0) {
+			if (match == 0) { //skip 30 kmers until atleast 1 absolute match is found
 				if (counter < step) {
 					continue;
 				}
 				counter = 0; //reset counter for skipping STEP number of references
 			}
 			if (std::next(kmer_ref_iterator, 1) == reference->end() || std::next(kmer_ref_iterator, 2) == reference->end() || std::next(kmer_ref_iterator, 3) == reference->end() || std::next(kmer_ref_iterator, 4) == reference->end() || std::next(kmer_ref_iterator, 5) == reference->end() || std::next(kmer_ref_iterator, 6) == reference->end() || std::next(kmer_ref_iterator, 7) == reference->end() || std::next(kmer_ref_iterator, 8) == reference->end() || std::next(kmer_ref_iterator, 9) == reference->end() || std::next(kmer_ref_iterator, 10) == reference->end()) {
-				return -99999;
+				return -99999; //if the end of reference is reached
 			}
-			auto kmer_ref = *kmer_ref_iterator;
+			auto kmer_ref = *kmer_ref_iterator; //check few values (with some step)
 			auto kmer_ref2_it = std::next(kmer_ref_iterator, 2);
 			auto kmer_ref4_it = std::next(kmer_ref_iterator, 4);
 			auto kmer_ref6_it = std::next(kmer_ref_iterator, 6);
-			//auto kmer_ref8_it = std::next(kmer_ref_iterator, 8);
-			//auto kmer_ref10_it = std::next(kmer_ref_iterator, 10);
+
 			Kmer kmer_ref2 = *kmer_ref2_it;
 			Kmer kmer_ref4 = *kmer_ref6_it;
 			Kmer kmer_ref6 = *kmer_ref6_it;
-			//Kmer kmer_ref8 = *kmer_ref8_it;
-			//Kmer kmer_ref10 = *kmer_ref10_it;
+
 			flag1 = 0;
+			//iterate through sequence
 			for (auto kmer_seq_iterator = sequence->begin(); kmer_seq_iterator != sequence->end(); ++kmer_seq_iterator) {
 				auto kmer_seq = *kmer_seq_iterator;
 				flag1++;
-				if (flag1 < 3) {
+				if (flag1 < 3) { //skip first few k-mers, since they are probably end-mers and different from sequence k-mers
 					continue;
 				}
-				if (flag1 > 209) {
+				if (flag1 > 209) { //if match isn't found in the first 209 k-mers, stop search
 					break;
 				}
-				//if (!mapping::check_match(kmer_ref, kmer_seq)) {
-					//continue;
-				//}
-				//auto mapped = Alignment::Align_int(kmer_ref, kmer_seq); //HERE IS BIGGEST TIME CONSUMER NEEDS TO BE CHANGED
-				if (match == 0)
+				if (match == 0) //untill 1 match is found, check few k-mers at once with big step between searches
 					mapped = (kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref2.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref4.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref6.ordering_number_for_string == kmer_seq.ordering_number_for_string); //|| kmer_ref8.ordering_number_for_string == kmer_seq.ordering_number_for_string || kmer_ref10.ordering_number_for_string == kmer_seq.ordering_number_for_string);
-				//if (mapped > (kmer_size * 4 - 4 - 2 * 2)) { //VERY IMPORTANT!!! ALL THE VALUES OF ALREADY ALIGNED KMERS GET BACK HERE INSIDE VECTOR MAPPED- CAN BE USED FOR MUTATION FINDING
-				else
+				
+				else //after 1 match is found, search one by one
 					mapped = kmer_ref.ordering_number_for_string == kmer_seq.ordering_number_for_string;
 				if(mapped){
 					counter++;
-
-					match++;
+					match++; //match count
 					if (match > 7) {
-						return kmer_ref.position - kmer_seq.position;
+						return kmer_ref.position - kmer_seq.position; //if enough matches found, return mapped position
 						//break;
 					}
-				
+					//OBSOLETE CODE, reason: TOO SLOW, but better precision
 					/*if(matches.find(kmer_seq.position) == matches.end())
 					{// key kmer_seq.position doesn't exist
 						Kmer_mapping new_position = Kmer_mapping(kmer_seq.position, kmer_ref.position);
@@ -109,9 +104,10 @@ namespace mapping {
 				}
 			}
 		}
-		/*if (match <= 5) {
+		/*if (match <= 5) { //if sequence is very damaged
 			return -99999;
 		}
+		//check if the 3 sequal matches exist, map only quality sequnces
 		for (auto it1 = seq_pos_match.begin(); it1 != seq_pos_match.end(); ++it1) {
 			if (std::next(it1, 1) != seq_pos_match.end()) {
 				auto it2 = std::next(it1, 1);
@@ -127,10 +123,8 @@ namespace mapping {
 									for (auto cc : c) {
 										if (cc - bb >= *it3 - *it2 - n && cc - bb <= *it3 - *it2 + n) {
 											return(aa - *it1);
-
 										}
 									}
-
 								}
 							}
 						}
