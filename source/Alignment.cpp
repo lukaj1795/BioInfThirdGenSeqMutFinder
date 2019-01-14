@@ -11,7 +11,7 @@ const int DELETE = 2; // delete index for operation matrix
 const int radius = 2; // radius of search
 namespace Alignment {
 
-		int count = 0;
+		int count = 0; //used for offset
 		std::vector<int> matrix; //search matrix
 		std::vector<int> operations;  // operations used matrix
 		std::vector<int> operation{ 0, 0, 0 };  // operations cost matrix
@@ -26,7 +26,7 @@ namespace Alignment {
 
 			aligned_string.reserve(2);
 
-			//resets opertions and matrix values
+			//resets operations and matrix values
 			for (int i = 0; i < size; i++) {
 				matrix[i] = 0;
 				operations[i] = 0;
