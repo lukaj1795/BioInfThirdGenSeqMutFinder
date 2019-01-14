@@ -19,7 +19,7 @@ using namespace mapping;
 
 
 //simple test for mutation finder
-void mutation_test(){
+/*void mutation_test(){
 	auto g1 = Genome(1);
 	auto g2 = Genome(2);
 
@@ -44,14 +44,14 @@ void mutation_test(){
 
 	auto m = MutationFinder::MapToVector(map);
 	MutationFinder::output_to_file("mut.csv", m);
-}
+}*/
 
 
 
 int main(int argc, char** argv){
 
 	//mutation_test();
-	int w = 11;
+	int w = 7;
 	int k = 14;
 	auto start = chrono::high_resolution_clock::now();
 	std::map<int, std::vector<MutationFinder::MutationOutput>> map;
@@ -122,7 +122,7 @@ int main(int argc, char** argv){
 		g.genomeString = std::move(i);
 		auto kmerx = kmer.extract(&g); //extracting k-mers for sequence
 		int position = mapping::alternative_mapping(kmer_position, kmerx); //trying to find position of sequence inside the reference
-		if (position != -99999) { //if position not equal -99999 position is found
+		if (position != -99999) { //if position not equal to -99999 position is found
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(position, kmerx)); //save position for mutation finding, position isn't 100% accurate
 			continue; //don't search the reverse if sequence is mapped
 		}
@@ -134,7 +134,7 @@ int main(int argc, char** argv){
 		gr.genomeString = std::move(ir);
 		auto kmery = kmer.extract_complement(&gr); //extracting k-mers of strings complement!!
 		int positiony = mapping::alternative_mapping(kmer_position, kmery); //trying to find position of reverse complement
-		if (positiony != -99999) { //if position is find
+		if (positiony != -99999) { //if position is found
 			sequence_kmers.insert(std::pair<int, std::vector<Kmer>>(positiony, kmery)); //save the postion for mutation finding, position isn't 100% accurate
 		}
 	}

@@ -1,6 +1,6 @@
 #include<vector>
 #include<map>
-
+//namespace used for finding mutations
 namespace MutationFinder{
 
 	enum Mutation {
@@ -9,14 +9,14 @@ namespace MutationFinder{
 		SUBSTITUTION,
 		NONE
 		};
-
+	//class that represents mutation output
 	class MutationOutput
 		{
 		public:
 			MutationOutput();
-			Mutation mutation;
-			char sign;
-			int position;
+			Mutation mutation; //mutation that happened
+			char sign; // sign that was inserted, matched, deleted or substitution sign
+			int position; // position in which it happened
 			MutationOutput(Mutation, char, int);
 
 			bool operator==(const MutationOutput &other) const
@@ -31,9 +31,9 @@ namespace MutationFinder{
 
 	//maps mutations to output map
 	void map_mutations(int position, std::vector<std::string> aligned_strings,std::map<int,std::vector<MutationOutput>> &output);
-	//output given vector to file in given path
+	//outputs given vector to file in given path
 	void output_to_file(std::string path, std::vector<MutationOutput> output);
-	//creates vector with most probalble mutations
+	//creates vector with most probable mutations
 	std::vector<MutationOutput> MapToVector(std::map<int, std::vector<MutationOutput>> outputMap);
 	
 }
@@ -46,7 +46,6 @@ namespace std
 	struct hash<MutationFinder::MutationOutput>
 		{
 		size_t operator()(const MutationFinder::MutationOutput& k) const{
-			// Compute individual hash values for two data members and combine them using XOR and bit shifting
 			return ((hash<int>()(k.sign) ^ (hash<char>()(k.sign) << 1)^hash<int>()(k.mutation)) >> 1);
 			}
 		};			

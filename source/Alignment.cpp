@@ -5,20 +5,19 @@
 #include <vector>
 #include <array>
 
-const int MATCH = 0;
-const int INSERT = 1;
-const int DELETE = 2;
-const int radius = 2;
+const int MATCH = 0;  // match index for operation matrix
+const int INSERT = 1; // insert index for operation matrix
+const int DELETE = 2; // delete index for operation matrix
+const int radius = 2; // radius of search
 namespace Alignment {
 
 		int count = 0;
-		std::vector<int> matrix;
-		std::vector<int> operations;
-		std::vector<int> operation{ 0, 0, 0 };
-
-		int row;
-		int column;
-		int size;
+		std::vector<int> matrix; //search matrix
+		std::vector<int> operations;  // operations used matrix
+		std::vector<int> operation{ 0, 0, 0 };  // operations cost matrix
+		int row; //row count
+		int column; // column count
+		int size; // size of the matrix
 
 		std::pair<int, std::vector<std::string>> Align(const std::string &kmer_ref,const std::string &kmer_seq) {
 
@@ -27,7 +26,7 @@ namespace Alignment {
 
 			aligned_string.reserve(2);
 
-
+			//resets opertions and matrix values
 			for (int i = 0; i < size; i++) {
 				matrix[i] = 0;
 				operations[i] = 0;
@@ -37,10 +36,8 @@ namespace Alignment {
 
 				for (int j =std::max(1,i-radius); j < column; j++) {
 
-
+					//if out of search range
 					if ((abs(i - j) > radius)) {
-						//std::cerr << (abs(i - j)) << "\n";
-						//std::cerr << index << "\n";
 						continue;
 					}
 					auto index = i * (column)+j;
@@ -51,11 +48,6 @@ namespace Alignment {
 					operation[INSERT] = matrix[index - 1] - Genome::INSERT;
 					operation[DELETE] = matrix[index - column] - Genome::DELETE;
 
-					/*auto res=std::max(operation.begin(),operation.end());
-					matrix[index] = *res;
-					operations[index] = std::distance(operation.begin(),res);*/
-					//std::cerr << matrix[index]<<"\n";
-					//std::cerr << operations[index]<<"\n";
 					for (int k = MATCH; k <= DELETE; k++) {
 
 						if (operation[k] > matrix[index]) {
@@ -100,11 +92,7 @@ namespace Alignment {
 				//std::cout << len << "\n";
 				aligned_string.push_back(ref.substr(0, len));
 				aligned_string.push_back(seq.substr(0, len));
-				//std::cout <<"ref:	"<< kmer_ref.string << "\n";
-				//std::cout <<"seq:	"<< kmer_seq.string << "\n" << "\nAlignment\n";
-				//std::cout <<"ref:	"<< ref/*.substr(0, len) */ << '\n';
-				//std::cout <<"seq:	"<< seq/*.substr(0, len)*/ << '\n' << "\n";
-				//offset = index/column - count/column;
+
 			}
 			return std::move(std::make_pair(count / column, aligned_string));
 		}
